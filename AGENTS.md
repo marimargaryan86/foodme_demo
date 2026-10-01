@@ -31,7 +31,13 @@ npx playwright test [e2e/file.spec.ts]   # starts dev server on :5180
 
 Admin (`apps/admin`): `npm run dev`, `npm run lint` (eslint), `npm run build`, `npx playwright test` (dev server on :5174, runs serially).
 
-Playwright needs the backend running on :8081. Override the base URLs with `PLAYWRIGHT_BASE_URL` (web) or `ADMIN_BASE_URL` (admin). `npm run test:e2e:all` in `apps/web` runs both suites.
+E2E tests run against the deployed app, not a local backend. Wake it first (`curl -m 60 <base>/actuator/health`), then set all three base URLs, or the configs fall back to localhost and start a dev server:
+```bash
+BASE=https://foodme-marimargaryan86.onrender.com
+PLAYWRIGHT_BASE_URL=$BASE VITE_API_BASE_URL=$BASE ADMIN_BASE_URL=$BASE/backoffice/ \
+  npx playwright test --workers=2
+```
+`npm run test:e2e:all` in `apps/web` runs both suites (with the same env vars).
 
 CI's e2e job uses `infra/docker-compose.yml`, which isn't in the repo, so that job is broken. The compose notes in `.env.example` are out of date for the same reason.
 
