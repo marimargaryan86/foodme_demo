@@ -11,6 +11,12 @@ FoodMe is a food-ordering demo app for a QA course. It runs as a single Render f
 
 `apps/backend/Dockerfile` builds from the repo root. It bundles the storefront at `/`, the admin at `/backoffice`, and serves the REST APIs at `/api/**` (public/customer) and `/admin/**` (admin, JWT). The admin UI is at `/backoffice` because `/admin` is taken by the API. The per-app Dockerfiles, `nginx.conf` and `vercel.json` aren't used by the Render deploy.
 
+## Agent config
+
+- `.agents/skills/`: agent-neutral skills (`SKILL.md` per folder), usable by any coding agent that reads `.agents/`. `write-e2e-test` writes a Playwright spec and runs it 3× against prod; `triage-test-failure` classifies a failing test and drafts a bug report.
+- `.claude/skills` is a symlink to `.agents/skills`, so Claude Code loads the same files. Edit skills in `.agents/skills/` only.
+- `.claude/rules/` and `.claude/hooks/` are Claude Code-specific (path-scoped rules and tool hooks).
+
 ## Commands
 
 Backend (`apps/backend`); the local DB is Postgres on :5432 with db, user and password all `foodme`:
