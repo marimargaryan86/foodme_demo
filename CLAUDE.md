@@ -3,7 +3,7 @@
 ## Claude Code
 
 - PRs are auto-reviewed by `anthropics/claude-code-action` (`.github/workflows/claude-pr-review.yml`, needs the `ANTHROPIC_API_KEY` secret). Edit its `prompt:` to change what gets reviewed.
-- Rules in `.claude/rules/` load automatically when Claude works on files matching their `paths:` frontmatter:
+- Rules live in `.agents/rules/` (`.claude/rules` is a symlink to it; hooks likewise in `.agents/hooks/`). They load automatically when Claude works on files matching their `paths:` frontmatter:
   - `e2e-tests.md`: `apps/web/e2e/` and `apps/admin/e2e/` (prod target, test data, locators, waiting).
   - `admin-e2e.md`: `apps/admin/e2e/` only (relative `#/` routes under `/backoffice/`, MUI locators, admin helpers).
 - Skills live in `.agents/skills/`; `.claude/skills` is a symlink to it, so Claude Code loads them from there:
