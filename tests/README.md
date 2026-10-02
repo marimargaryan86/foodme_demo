@@ -38,7 +38,7 @@
 
 ## Shared preconditions
 
-**Fast setup:** run `/prepare-test-data` in Claude Code (or `node tests/prepare-data.mjs`). It wakes the app and creates P1 plus three P3 orders (for FM-TC-13, 14 and 15), and writes them to `tests/.run-data.md` (git-ignored). Use `--dry-run` to only wake the app. To set up by hand instead:
+**Fast setup:** run `/prepare-test-data` in Claude Code (or `node tests/prepare-data.mjs`). It wakes the app and creates P1 plus three P3 orders (for FM-TC-13, 14 and 15), and writes them to `tests/.run-data.md` (git-ignored). Use `--dry-run` to only wake the app. When the session is over, run `/cleanup-test-data` (or `node tests/cleanup-data.mjs [FM-… orders placed during the run]`): the API can't delete anything, so it sets the run's still-active test orders to REJECTED with a "Test data cleanup" reason. To set up by hand instead:
 
 - **P1 · Registered customer:** open `/register`, fill Full name, a unique Email, Phone and Password, click **Create account**. You land on **Your orders**.
 - **P2 · Item in cart:** open **Explore chefs**, open any chef, click a dish, click **Add to cart**. The cart panel on the right lists it.

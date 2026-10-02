@@ -28,7 +28,8 @@ Read `tests/.run-data.md` (git-ignored) and show the user its table: customer em
 Then remind them:
 - **Signing in is their step.** Claude doesn't type passwords into the site. They sign in as the customer (storefront) and as admin (`/backoffice/`) in the browser; Claude continues from there.
 - **Run FM-TC-13 before FM-TC-14 and FM-TC-15** if they share a browser session, and only change the status of the orders listed in the file.
-- Checkout cases (FM-TC-08 to FM-TC-11) create their own orders by design; this script doesn't prepare data for them.
+- Checkout cases (FM-TC-08 to FM-TC-11) create their own orders by design; this script doesn't prepare data for them. Note their order numbers for cleanup.
+- When the session is over, run `/cleanup-test-data`.
 
 ## Don't
 

@@ -10,3 +10,4 @@
   - `/write-e2e-test <flow>`: manual only. Checks the deployed app is awake, writes a Playwright spec, runs it against the deployed app with `--repeat-each=3` and flags flakiness.
   - `triage-test-failure`: classifies failing test output as product bug, test bug, flaky or environment, and drafts a bug report.
   - `/prepare-test-data [--dry-run]`: manual only. Wakes the deployed app and creates the customer and orders the manual cases in `tests/` need (`tests/prepare-data.mjs`).
+  - `/cleanup-test-data [FM-… numbers] [--dry-run]`: manual only. Ends a test session: sets the run's still-active test orders to REJECTED (the API can't delete) and closes the browser tabs Claude opened (`tests/cleanup-data.mjs`).
