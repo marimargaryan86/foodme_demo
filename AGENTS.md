@@ -15,7 +15,7 @@ FoodMe is a food-ordering demo app for a QA course. It runs as a single Render f
 
 - `.agents/skills/`: agent-neutral skills (`SKILL.md` per folder), usable by any coding agent that reads `.agents/`. `write-e2e-test` writes a Playwright spec and runs it 3× against prod; `triage-test-failure` classifies a failing test and drafts a bug report; `prepare-test-data` wakes prod and creates the data for the manual cases in `tests/` (via `tests/prepare-data.mjs`); `cleanup-test-data` rejects that run's still-active test orders afterwards (via `tests/cleanup-data.mjs`; nothing can be deleted through the API); `run-regression` runs the manual cases in a browser and records results in `tests/regression/`.
 - `.claude/skills` is a symlink to `.agents/skills`, so Claude Code loads the same files. Edit skills in `.agents/skills/` only.
-- `.claude/rules/` and `.claude/hooks/` are Claude Code-specific (path-scoped rules and tool hooks).
+- `.agents/rules/` (path-scoped rules) and `.agents/hooks/` (tool hooks) work the same way: `.claude/rules` and `.claude/hooks` are symlinks to them. Edit rules and hooks in `.agents/` only.
 
 ## Commands
 
