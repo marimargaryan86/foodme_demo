@@ -11,3 +11,4 @@
   - `triage-test-failure`: classifies failing test output as product bug, test bug, flaky or environment, and drafts a bug report.
   - `/prepare-test-data [--dry-run]`: manual only. Wakes the deployed app and creates the customer and orders the manual cases in `tests/` need (`tests/prepare-data.mjs`).
   - `/cleanup-test-data [FM-… numbers] [--dry-run]`: manual only. Ends a test session: sets the run's still-active test orders to REJECTED (the API can't delete) and closes the browser tabs Claude opened (`tests/cleanup-data.mjs`).
+  - `run-regression`: runs the agent-runnable steps of all 15 manual cases in Claude's Chrome tab group (needs a signed-in customer and admin there, once), records the result in `tests/regression/history.md` + `runs/`, compares with the previous run, cleans up and adds lessons to its own `Lessons learned`. Model-invocable so `/goal` can repeat it.

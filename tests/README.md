@@ -18,23 +18,27 @@
 
 ## Index
 
-| ID | Title | Area | Type | Priority |
-|---|---|---|---|---|
-| [FM-TC-01](browsing.md#fm-tc-01-explore-lists-active-chefs) | Explore lists active chefs | Browsing | Functional | Medium |
-| [FM-TC-02](browsing.md#fm-tc-02-header-search-finds-chefs) | Header search finds chefs | Browsing | Functional, negative | Medium |
-| [FM-TC-03](browsing.md#fm-tc-03-dish-additions-change-the-price) | Dish additions change the price | Browsing | Functional | High |
-| [FM-TC-04](cart.md#fm-tc-04-cart-quantity-controls) | Cart quantity controls | Cart | Functional, regression (FM-BUG-07) | High |
-| [FM-TC-05](cart.md#fm-tc-05-cart-survives-a-reload) | Cart survives a reload | Cart | Functional | Medium |
-| [FM-TC-06](cart.md#fm-tc-06-cart-holds-one-chef-only) | Cart holds one chef only | Cart | Business rule | High |
-| [FM-TC-07](cart.md#fm-tc-07-delivery-fee-and-free-delivery-threshold) | Delivery fee and free-delivery threshold | Cart | Business rule | Medium |
-| [FM-TC-08](checkout.md#fm-tc-08-checkout-requires-an-account) | Checkout requires an account | Checkout | Functional | High |
-| [FM-TC-09](checkout.md#fm-tc-09-delivery-order-end-to-end) | Delivery order end to end | Checkout | Functional, smoke | High |
-| [FM-TC-10](checkout.md#fm-tc-10-takeaway-order-needs-no-address) | Takeaway order needs no address | Checkout | Functional | High |
-| [FM-TC-11](checkout.md#fm-tc-11-checkout-form-validation) | Checkout form validation | Checkout | Negative | High |
-| [FM-TC-12](account.md#fm-tc-12-sign-in-wrong-password-and-sign-out) | Sign in, wrong password and sign out | Account | Functional, negative | High |
-| [FM-TC-13](account.md#fm-tc-13-order-history-and-tracking) | Order history and tracking | Account | Functional | High |
-| [FM-TC-14](back-office.md#fm-tc-14-admin-accepts-and-delivers-an-order) | Admin accepts and delivers an order | Back office | Functional, end to end | High |
-| [FM-TC-15](back-office.md#fm-tc-15-admin-rejects-an-order) | Admin rejects an order | Back office | Functional, negative | High |
+| ID | Title | Area | Type | Priority | Agent run |
+|---|---|---|---|---|---|
+| [FM-TC-01](browsing.md#fm-tc-01-explore-lists-active-chefs) | Explore lists active chefs | Browsing | Functional | Medium | Full |
+| [FM-TC-02](browsing.md#fm-tc-02-header-search-finds-chefs) | Header search finds chefs | Browsing | Functional, negative | Medium | Full |
+| [FM-TC-03](browsing.md#fm-tc-03-dish-additions-change-the-price) | Dish additions change the price | Browsing | Functional | High | Full |
+| [FM-TC-04](cart.md#fm-tc-04-cart-quantity-controls) | Cart quantity controls | Cart | Functional, regression (FM-BUG-07) | High | Full |
+| [FM-TC-05](cart.md#fm-tc-05-cart-survives-a-reload) | Cart survives a reload | Cart | Functional | Medium | Steps 1–2 |
+| [FM-TC-06](cart.md#fm-tc-06-cart-holds-one-chef-only) | Cart holds one chef only | Cart | Business rule | High | Full |
+| [FM-TC-07](cart.md#fm-tc-07-delivery-fee-and-free-delivery-threshold) | Delivery fee and free-delivery threshold | Cart | Business rule | Medium | Full |
+| [FM-TC-08](checkout.md#fm-tc-08-checkout-requires-an-account) | Checkout requires an account | Checkout | Functional | High | Step 2 |
+| [FM-TC-09](checkout.md#fm-tc-09-delivery-order-end-to-end) | Delivery order end to end | Checkout | Functional, smoke | High | Full |
+| [FM-TC-10](checkout.md#fm-tc-10-takeaway-order-needs-no-address) | Takeaway order needs no address | Checkout | Functional | High | Full |
+| [FM-TC-11](checkout.md#fm-tc-11-checkout-form-validation) | Checkout form validation | Checkout | Negative | High | Full |
+| [FM-TC-12](account.md#fm-tc-12-sign-in-wrong-password-and-sign-out) | Sign in, wrong password and sign out | Account | Functional, negative | High | Human-only |
+| [FM-TC-13](account.md#fm-tc-13-order-history-and-tracking) | Order history and tracking | Account | Functional | High | Steps 1–5 |
+| [FM-TC-14](back-office.md#fm-tc-14-admin-accepts-and-delivers-an-order) | Admin accepts and delivers an order | Back office | Functional, end to end | High | Steps 3–7 |
+| [FM-TC-15](back-office.md#fm-tc-15-admin-rejects-an-order) | Admin rejects an order | Back office | Functional, negative | High | Full |
+
+## Agent runs (regression)
+
+`/run-regression` runs the agent-runnable steps of all 15 cases in Claude's Chrome tab group and records the result in [regression/history.md](regression/history.md). It needs a signed-in customer and a signed-in admin in that browser, done once by a person: sessions don't expire, and the agent never signs out. Steps marked human-only (signing in/out, creating accounts, private windows) are reported as `SKIP`.
 
 ## Shared preconditions
 

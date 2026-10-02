@@ -6,6 +6,7 @@ See [README](README.md) for environment, data rules and shared preconditions. Ea
 
 - **Priority:** High · **Type:** Functional
 - **Preconditions:** signed out; P2 · one dish in the cart.
+- **Agent run:** step 2 only (steps 1 and 3 need a signed-out browser: human-only)
 
 | # | Step | Expected result |
 |---|---|---|
@@ -17,12 +18,13 @@ See [README](README.md) for environment, data rules and shared preconditions. Ea
 
 - **Priority:** High · **Type:** Functional, smoke
 - **Preconditions:** P1 signed in; P2 · one dish in the cart.
+- **Agent run:** full (signed-in customer session)
 
 | # | Step | Expected result |
 |---|---|---|
 | 1 | **Go to checkout**, choose **Delivery To your door** | Address fields City, Street, Building, Apartment are shown; summary shows Subtotal, Delivery, Total |
 | 2 | Fill Full name, Phone `+37490000000`, Email, City `Yerevan`, Street `Tumanyan`, Building `10`; keep **Cash on delivery** | No validation messages |
-| 3 | Click **Place order** | `/orders/success` with "Order placed!", "Your order number is FM-…", **Track order** and **Back to explore** |
+| 3 | Click **Place order** | `/orders/success` with "Order placed!", "Your order number is FM-…", **Track order**, **View my orders** and **Back to explore** |
 | 4 | Check the cart counter in the header | 0: the cart was emptied after ordering |
 | 5 | Click **Track order** | `/tracking/FM-…` with "Order received" |
 
@@ -30,6 +32,7 @@ See [README](README.md) for environment, data rules and shared preconditions. Ea
 
 - **Priority:** High · **Type:** Functional
 - **Preconditions:** P1 signed in; P2 · one dish in the cart.
+- **Agent run:** full (signed-in customer session)
 
 | # | Step | Expected result |
 |---|---|---|
@@ -41,6 +44,7 @@ See [README](README.md) for environment, data rules and shared preconditions. Ea
 
 - **Priority:** High · **Type:** Negative
 - **Preconditions:** P1 signed in; P2 · one dish in the cart; on `/checkout` with **Delivery** selected.
+- **Agent run:** full (signed-in customer session)
 
 | # | Step | Expected result |
 |---|---|---|

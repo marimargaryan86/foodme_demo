@@ -8,6 +8,7 @@ Allowed status changes: NEW → ACCEPTED or REJECTED; ACCEPTED → DELIVERED or 
 
 - **Priority:** High · **Type:** Functional, end to end
 - **Preconditions:** P3 · a new order `FM-…` (status NEW). Customer signed in in one window; a second window (private) for admin.
+- **Agent run:** steps 3–7, using the order from FM-TC-09 (customer and admin tabs); steps 1–2 are the admin sign-in: human-only
 
 | # | Step | Expected result |
 |---|---|---|
@@ -23,6 +24,7 @@ Allowed status changes: NEW → ACCEPTED or REJECTED; ACCEPTED → DELIVERED or 
 
 - **Priority:** High · **Type:** Functional, negative
 - **Preconditions:** P3 · a new order `FM-…` (status NEW); signed in to admin.
+- **Agent run:** full, using the order from FM-TC-10
 
 | # | Step | Expected result |
 |---|---|---|

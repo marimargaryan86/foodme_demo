@@ -6,6 +6,7 @@ See [README](README.md) for environment, data rules and shared preconditions.
 
 - **Priority:** High · **Type:** Functional, negative
 - **Preconditions:** P1 · a registered customer, signed out.
+- **Agent run:** human-only (typing credentials and signing out is the test)
 
 | # | Step | Expected result |
 |---|---|---|
@@ -20,6 +21,7 @@ See [README](README.md) for environment, data rules and shared preconditions.
 
 - **Priority:** High · **Type:** Functional
 - **Preconditions:** P3 · a customer with one placed order `FM-…`, signed in.
+- **Agent run:** steps 1–3 and 5 in the browser, using the order from FM-TC-09; step 4 by API (`GET /api/order/number/FM-…` without a token must return the order); step 6 human-only
 
 | # | Step | Expected result |
 |---|---|---|

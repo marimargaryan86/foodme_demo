@@ -4,6 +4,7 @@
 //   node tests/cleanup-data.mjs                  # clean up the run in tests/.run-data.md
 //   node tests/cleanup-data.mjs FM-100018 ...    # also clean up orders placed during the run (e.g. checkout cases)
 //   node tests/cleanup-data.mjs --dry-run        # show what would happen; changes nothing
+//   node tests/cleanup-data.mjs --only FM-100018  # only the given orders; ignore tests/.run-data.md (used by run-regression)
 //
 // The API has no delete endpoints, so nothing is deleted. Every test order that is still
 // active (NEW or ACCEPTED) is moved to REJECTED with a "test data cleanup" reason, so it
@@ -19,6 +20,7 @@ import { fileURLToPath } from "node:url";
 
 const BASE = process.env.FOODME_BASE_URL || "https://foodme-marimargaryan86.onrender.com";
 const DRY_RUN = process.argv.includes("--dry-run");
+const ONLY = process.argv.includes("--only");
 const EXTRA = process.argv.slice(2).filter((a) => /^FM-\d+$/.test(a));
 const RUN_FILE = join(dirname(fileURLToPath(import.meta.url)), ".run-data.md");
 const REASON = `Test data cleanup (${new Date().toISOString().slice(0, 10)})`;
@@ -35,7 +37,7 @@ async function api(path, { method = "GET", body, token } = {}) {
 }
 
 function readRun() {
-  if (!existsSync(RUN_FILE)) return { email: null, numbers: [] };
+  if (ONLY || !existsSync(RUN_FILE)) return { email: null, numbers: [] };
   const text = readFileSync(RUN_FILE, "utf8");
   if (/^## Cleaned up/m.test(text) && EXTRA.length === 0) {
     throw new Error(`${RUN_FILE} is already cleaned up. Pass order numbers to clean up others.`);
@@ -90,7 +92,7 @@ async function main() {
   for (const [number, outcome] of results) console.log(`- ${number}: ${outcome}`);
   if (run.email) console.log(`- customer ${run.email}: kept (the API cannot delete customers)`);
 
-  if (!DRY_RUN && existsSync(RUN_FILE)) {
+  if (!DRY_RUN && !ONLY && existsSync(RUN_FILE)) {
     appendFileSync(
       RUN_FILE,
       ["", `## Cleaned up ${new Date().toISOString()}`, "", ...results.map(([n, o]) => `- ${n}: ${o}`), ""].join("\n"),

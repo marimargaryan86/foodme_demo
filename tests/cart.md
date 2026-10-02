@@ -6,6 +6,7 @@ The storefront cart lives in the browser (IndexedDB), not on the server, and hol
 
 - **Priority:** High · **Type:** Functional, regression for FM-BUG-07 (decrement removed the item one step early)
 - **Preconditions:** P2 · one dish in the cart, quantity 1.
+- **Agent run:** full
 
 | # | Step | Expected result |
 |---|---|---|
@@ -18,6 +19,7 @@ The storefront cart lives in the browser (IndexedDB), not on the server, and hol
 
 - **Priority:** Medium · **Type:** Functional
 - **Preconditions:** P2 · two different dishes from the same chef in the cart; note the header cart counter.
+- **Agent run:** steps 1–2 (step 3 needs a private window: human-only)
 
 | # | Step | Expected result |
 |---|---|---|
@@ -29,6 +31,7 @@ The storefront cart lives in the browser (IndexedDB), not on the server, and hol
 
 - **Priority:** High · **Type:** Business rule
 - **Preconditions:** P2 · a dish from chef A (e.g. Argentinean) in the cart.
+- **Agent run:** full
 
 | # | Step | Expected result |
 |---|---|---|
@@ -41,6 +44,7 @@ The storefront cart lives in the browser (IndexedDB), not on the server, and hol
 
 - **Priority:** Medium · **Type:** Business rule
 - **Preconditions:** empty cart; a chef with delivery 500 AMD, free from 5,000 AMD (true for all chefs on prod as of Oct 2026).
+- **Agent run:** full
 
 | # | Step | Expected result |
 |---|---|---|

@@ -6,6 +6,7 @@ See [README](README.md) for environment, data rules and shared preconditions.
 
 - **Priority:** Medium · **Type:** Functional
 - **Preconditions:** none.
+- **Agent run:** full
 
 | # | Step | Expected result |
 |---|---|---|
@@ -22,6 +23,7 @@ See [README](README.md) for environment, data rules and shared preconditions.
 
 - **Priority:** Medium · **Type:** Functional, negative
 - **Preconditions:** none.
+- **Agent run:** full
 
 | # | Step | Expected result |
 |---|---|---|
@@ -34,6 +36,7 @@ See [README](README.md) for environment, data rules and shared preconditions.
 
 - **Priority:** High · **Type:** Functional
 - **Preconditions:** empty cart.
+- **Agent run:** full
 
 | # | Step | Expected result |
 |---|---|---|
