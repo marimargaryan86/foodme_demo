@@ -20,10 +20,11 @@ Goal of every run: **the same app gives the same table.** Follow the steps below
 ## 1. Preflight
 
 1. `node tests/prepare-data.mjs --dry-run`: wakes the app (creates nothing).
-2. `tabs_context_mcp` (create the group if needed). Use one storefront tab and one admin tab; open them if missing.
-3. Storefront tab, open `/orders`: must show **Your orders** and a header link named "Account, …". Admin tab, open `/backoffice/#/orders`: must show the **Orders** menu item.
-4. If either session is missing, **stop**: don't record a run. Tell the user which one to sign in to (once; sessions don't expire) and end.
-5. Empty the cart (Remove item on every cart line) so every run starts the same.
+2. Use the **Claude in Chrome** tools (`mcp__claude-in-chrome__*`), not the built-in browser pane: only the user's Chrome has the signed-in sessions. If the tools are deferred, load them first with one ToolSearch call (`select:` the tools you need, including `browser_batch`). If the extension isn't connected, stop and tell the user; don't fall back to another browser.
+3. `tabs_context_mcp` (create the group if needed). Use one storefront tab and one admin tab; open them if missing.
+4. Storefront tab, open `/orders`: must show **Your orders** and a header link named "Account, …". Admin tab, open `/backoffice/#/orders`: must show the **Orders** menu item.
+5. If either session is missing, **stop**: don't record a run. Tell the user which one to sign in to (once; sessions don't expire) and end.
+6. Empty the cart (Remove item on every cart line) so every run starts the same.
 
 ## 2. Run the cases in this order, with this data
 
