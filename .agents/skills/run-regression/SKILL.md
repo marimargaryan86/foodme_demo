@@ -47,6 +47,8 @@ Goal of every run: **the same app gives the same table.** Follow the steps below
 
 Receiver details on checkout: keep what's prefilled; if empty use `QA Regression`, `+37490000000`, the signed-in email.
 
+**How to drive the pages** (proven over runs 3–10, see Lessons learned): set field values in JavaScript (native setter + `input` event), never by typing at coordinates; open admin orders at `#/orders/<number − 100000>/show`; one short script per admin action with 3–5 s `computer` waits between them; navigate the storefront fresh before reading anything that an admin action changed; match statuses by their full text.
+
 **Result per case:** `PASS` (every agent-run step matched), `FAIL` (a step didn't match: record the step number and the actual text), `SKIP` (no agent-run steps), `ERROR` (couldn't execute a step, e.g. element not found after retries: record why). Partly human-only cases are PASS/FAIL on their agent-run steps. A case with a **Known issue** in its file still reports FAIL when that step fails; add "known issue" in the note.
 
 ## 3. Record
@@ -83,6 +85,8 @@ Show the run table, the history row, and the changes vs previous run. If the run
 - Admin: read the status from `.MuiChip-label`; order pages are `#/orders/<id>/show`.
 
 ## Lessons learned
+
+- 2026-10-02 (runs 3–10): With the lessons below applied, 8 runs in a row had no execution problems and identical results (`FPPPP PPPPP PSPPP`, ~5m20s each, down from 8m33s in run 1). Keep them; add new ones only when a run reports an execution problem.
 
 - 2026-10-02 (runs 1–2): Don't type into fields at screen coordinates (refs don't focus inputs; fields move when validation messages change). Set values in JavaScript with the native setter and an `input` event: `Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,v); el.dispatchEvent(new Event('input',{bubbles:true}))` (use `HTMLTextAreaElement` for the MUI rejection reason). Find fields by label: `input:not([type=radio])` whose `labels[0].innerText` matches. Header search: set the value, then `form.requestSubmit()`.
 - 2026-10-02 (run 1): Cleanup must use `--only`, or it also touches the manual-session orders in `tests/.run-data.md`.
