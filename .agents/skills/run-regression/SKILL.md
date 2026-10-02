@@ -84,8 +84,10 @@ Show the run table, the history row, and the changes vs previous run. If the run
 
 ## Lessons learned
 
-- 2026-10-02 (run 1): Text inputs don't get focus when clicked by `ref`; typing is lost. Click inputs by coordinates from a fresh screenshot, then type. Buttons and links can still be clicked by `ref` or via JavaScript `.click()`.
-- 2026-10-02 (run 1): Checkout fields move when validation messages appear or disappear. Take a new screenshot before typing into each field after a validation step, and verify values via JavaScript (`input.labels[0].innerText` + `value`) before clicking Place order.
-- 2026-10-02 (run 1): Checking input values with `input[type=text]` misses fields that have no `type` attribute; select `input:not([type=radio])` instead.
+- 2026-10-02 (runs 1–2): Don't type into fields at screen coordinates (refs don't focus inputs; fields move when validation messages change). Set values in JavaScript with the native setter and an `input` event: `Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,v); el.dispatchEvent(new Event('input',{bubbles:true}))` (use `HTMLTextAreaElement` for the MUI rejection reason). Find fields by label: `input:not([type=radio])` whose `labels[0].innerText` matches. Header search: set the value, then `form.requestSubmit()`.
 - 2026-10-02 (run 1): Cleanup must use `--only`, or it also touches the manual-session orders in `tests/.run-data.md`.
-
+- 2026-10-02 (run 2): Open admin orders directly at `#/orders/<id>/show` (id = order number − 100000) and check the `h5` heading matches; the admin list isn't reliably newest-first.
+- 2026-10-02 (run 2): The admin tab runs in the background, so its timers are throttled: keep each admin script short (one action), put `computer` waits of 3–5 s between them, and after **Cancel** wait at least 3 s before checking the dialog is gone.
+- 2026-10-02 (run 2): After any admin status change, **navigate** the storefront to `/orders` (fresh load) before reading badges; never read a page that was loaded before the change.
+- 2026-10-02 (run 2): Match tracking status by its full text ("Preparing your order", "Delivered" + "Enjoy your meal", "Order declined"); single words also match the progress bar ("Received | Preparing | Delivered").
+- 2026-10-02 (run 2): If a browser call reports "not connected", it may still have executed. Before restarting, check the latest order numbers (API `GET /api/order/number/FM-…` for the next numbers) and add any orders it created to cleanup.
