@@ -23,3 +23,4 @@ To check consistency, run it repeatedly, e.g. `/goal Run /run-regression until t
 | 15 | 2026-10-05 12:41 | 5m20s | 13 | 1 | 1 | 0 | `FPPPP PPPPP PSPPP` | none |
 | 16 | 2026-10-05 12:47 | 5m20s | 13 | 1 | 1 | 0 | `FPPPP PPPPP PSPPP` | none |
 | 17 | 2026-10-05 12:52 | 9m18s | 12 | 2 | 1 | 0 | `FPPPP FPPPP PSPPP` | FM-TC-06 P→F (app showed "Chef not found" for an existing chef; transient) |
+| 18 | 2026-10-05 13:02 | 17m55s | 13 | 1 | 1 | 0 | `FPPPP PPPPP PSPPP` | FM-TC-06: FAIL → PASS. The transient "Chef not found" from run 17 did not reproduce. |
