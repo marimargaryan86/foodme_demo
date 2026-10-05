@@ -40,6 +40,8 @@ The storefront cart lives in the browser (IndexedDB), not on the server, and hol
 | 3 | Add chef B's dish again, click **Clear & continue** | The cart now holds only chef B's dish; chef A's dish is gone |
 | 4 | Open `/chef/999999` | "Chef not found"; no "Switch kitchens?" dialog appears |
 
+**Known issue (found 2026-10-05, regression run 17):** opening an existing chef can show "Chef not found — This kitchen may be offline or the link is outdated." when the chef request is slow or fails (`apps/web/src/pages/Chef/index.tsx:71` treats every error as not found, with no retry). A reload fixes it. Step 1 then fails transiently.
+
 ## FM-TC-07: Delivery fee and free-delivery threshold
 
 - **Priority:** Medium · **Type:** Business rule

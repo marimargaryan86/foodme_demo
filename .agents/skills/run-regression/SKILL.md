@@ -35,11 +35,11 @@ Goal of every run: **the same app gives the same table.** Follow the steps below
 | 3 | FM-TC-03 | Alans Kitchen (`/chef/24`), Chuka Wakame Salad, addition Soy Sauce (+100) |
 | 4 | FM-TC-04 + FM-TC-07 | the salad from TC-03; 3 → 2 → 1, check delivery at each step; don't remove yet |
 | 5 | FM-TC-05 | add Crispy Salad; reload; new tab (close it, then `tabs_context_mcp`) |
-| 6 | FM-TC-06 | chef B = Chef Verona (`/chef/17`), first dish; then `/chef/999999` |
+| 6 | FM-TC-06 | chef B = Chef Verona (`/chef/17`), "Mushroom soup" (pick by name); then `/chef/999999` |
 | 7 | FM-TC-04 step 4, FM-TC-08 step 2 | remove the remaining item, open `/checkout` |
-| 8 | FM-TC-09 | Chef Verona, first dish; Delivery; Yerevan / Tumanyan / 10; note the order number |
-| 9 | FM-TC-10 | Chef Verona, first dish; Takeaway; note the order number |
-| 10 | FM-TC-11 | Chef Verona, first dish; invalid values from the case, then valid ones; note the order number |
+| 8 | FM-TC-09 | Chef Verona, "Mushroom soup" (pick by name); Delivery; Yerevan / Tumanyan / 10; note the order number |
+| 9 | FM-TC-10 | Chef Verona, "Mushroom soup" (pick by name); Takeaway; note the order number |
+| 10 | FM-TC-11 | Chef Verona, "Mushroom soup" (pick by name); invalid values from the case, then valid ones; note the order number |
 | 11 | FM-TC-13 | order from TC-09; step 4 by API: `curl -s -o /dev/null -w '%{http_code}' <base>/api/order/number/<FM-…>` must be 200 without a token |
 | 12 | FM-TC-14 | order from TC-09 (steps 3–7) |
 | 13 | FM-TC-15 | order from TC-10 |
@@ -86,6 +86,9 @@ Show the run table, the history row, and the changes vs previous run. If the run
 
 ## Lessons learned
 
+- 2026-10-05 (run 17): Pick dishes by name ("Mushroom soup"), never "first `button.dc_card`": the card order isn't stable while the chef page loads (TC-10 got "Rice" once).
+- 2026-10-05 (run 17): Never use a top-level `return` in `javascript_exec`: the script runs (orders get placed!) but the result is `undefined`. Wrap guarded logic in `const run = async () => {…}; await run()`.
+- 2026-10-05 (run 17): If a chef page shows "Chef not found" for a known chef, that's the app's error handling (any failed request shows it). Record the case as FAIL with the evidence, then reload once so the remaining steps still run; don't retry silently until it passes.
 - 2026-10-02 (runs 3–10): With the lessons below applied, 8 runs in a row had no execution problems and identical results (`FPPPP PPPPP PSPPP`, ~5m20s each, down from 8m33s in run 1). Keep them; add new ones only when a run reports an execution problem.
 
 - 2026-10-02 (runs 1–2): Don't type into fields at screen coordinates (refs don't focus inputs; fields move when validation messages change). Set values in JavaScript with the native setter and an `input` event: `Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,v); el.dispatchEvent(new Event('input',{bubbles:true}))` (use `HTMLTextAreaElement` for the MUI rejection reason). Find fields by label: `input:not([type=radio])` whose `labels[0].innerText` matches. Header search: set the value, then `form.requestSubmit()`.
