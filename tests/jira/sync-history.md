@@ -9,3 +9,4 @@ To check consistency, run it repeatedly, e.g. `/goal Run /sync-jira-bugs until t
 | 1 | 2026-10-05 16:54 | 4m | 20 | 3 | 1 | 2 | 0 | 3 | `01=KAN-5 04=KAN-4 06=KAN-6` | first sync: created KAN-6 (FM-TC-06); labelled KAN-5, KAN-4 with fm-tc-NN + foodme. Skill: label edits now read labels via getJiraIssue first (JQL results omit them); lookups in one JQL |
 | 2 | 2026-10-05 16:58 (corrected; was estimated as 17:00) | ~1m | 20 | 3 | 0 | 0 | 0 | 0 | `01=KAN-5 04=KAN-4 06=KAN-6` | none (no new run; all labels present). Skill: mapped tickets confirmed with one paired JQL instead of one getJiraIssue per ticket |
 | 3 | 2026-10-05 16:59 | 1m | 20 | 3 | 0 | 0 | 0 | 0 | `01=KAN-5 04=KAN-4 06=KAN-6` | none. Sync 2's start time had been estimated; corrected. Skill: start/duration now from `date -u` |
+| 4 | 2026-10-05 17:00 | 1m | 20 | 3 | 0 | 0 | 0 | 0 | `01=KAN-5 04=KAN-4 06=KAN-6` | none. Skill: one fixed collection command in step 2 (syncs 3 and 4 had used different greps) |
