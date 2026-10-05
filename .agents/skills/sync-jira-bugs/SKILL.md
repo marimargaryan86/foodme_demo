@@ -41,13 +41,13 @@ In this order, stop at the first hit:
 2. JQL `project = KAN AND labels = "fm-tc-NN"` (lower case, e.g. `fm-tc-06`).
 3. JQL `project = KAN AND text ~ "<2–4 distinctive words from the known issue>" ORDER BY created DESC`. A hit here is only a match if its summary or description clearly describes the same bug; if unsure, don't match: list it under **Needs a decision** and don't create a ticket for that case.
 
-Never create a ticket when step 2 or 3 found a candidate.
+Steps 2 and 3 for all cases can be one JQL (`key in (…) OR labels = "fm-tc-NN" OR text ~ "…"`); a hit still has to pass the step-3 check. Never create a ticket when step 2 or 3 found a candidate.
 
 ## 4. Decide the action per case
 
 | Situation | Action |
 |---|---|
-| Ticket found, missing its `fm-tc-NN` label | **label**: add `fm-tc-NN` and `foodme` (keep existing labels) |
+| Ticket found, missing its `fm-tc-NN` label | **label**: add `fm-tc-NN` and `foodme`. An edit replaces the whole list, so read the current labels with `getJiraIssue` first (JQL search results don't include labels) and send them all plus the new ones |
 | No ticket, case is a known issue or failing | **create** (template below) |
 | No ticket, bug regression case that passes | **none** (fixed bug, nothing to track) |
 | Ticket not Done, newest run `PASS`, and `bugs.md` doesn't already show that run as `PASS` | **comment**: "FM-TC-NN passed in regression run N (date). Please verify and close." Don't transition it |
