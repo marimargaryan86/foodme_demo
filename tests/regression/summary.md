@@ -58,7 +58,7 @@ Runs 17–20 showed the limit of adding a lesson after each failure: every run f
 - **Lessons folded into the procedure are deleted** from Lessons learned: the list went from 14 entries to 3 (limit 10). Only lessons not yet in the procedure stay (run 18 outage, run 17 "Chef not found", run 2 "not connected").
 - **Values, not just letters:** each run now records a fixed list of observed values per case, and history.md has a `Values` column, so a changed value under a PASS also counts as a difference.
 
-Not measured yet: the next `/goal` batch (runs 21+) should show whether durations return to ~5–6 min with no execution problems, and whether the observed values stay identical. Run 21 compares values with run 20, which has none, so the first value comparison is run 22.
+These changes were made after the 20 runs and weren't measured with another batch; the 20 runs above are the evidence for this exercise. A future `/goal` batch would show whether durations return to ~5–6 min with no execution problems and whether the observed values stay identical (run 21 would compare values with run 20, which has none, so the first value comparison would be run 22).
 
 ## Data
 
