@@ -40,6 +40,8 @@
 
 `/run-regression` runs the agent-runnable steps of all 15 cases in Claude's Chrome tab group and records the result in [regression/history.md](regression/history.md). It needs a signed-in customer and a signed-in admin in that browser, done once by a person: sessions don't expire, and the agent never signs out. Steps marked human-only (signing in/out, creating accounts, private windows) are reported as `SKIP`.
 
+**Why an agent in a browser, and not only Playwright?** These runs measure how consistent the agent and its skill are when the same cases run again and again, and whether the skill improves itself from its own failures. They aren't meant to replace automated tests. The findings from 20 runs are in [regression/summary.md](regression/summary.md). For deterministic, repeatable coverage use the Playwright specs in `apps/web/e2e/` and `apps/admin/e2e/` (see AGENTS.md → Commands).
+
 ## Shared preconditions
 
 **Fast setup:** run `/prepare-test-data` in Claude Code (or `node tests/prepare-data.mjs`). It wakes the app and creates P1 plus three P3 orders (for FM-TC-13, 14 and 15), and writes them to `tests/.run-data.md` (git-ignored). Use `--dry-run` to only wake the app. When the session is over, run `/cleanup-test-data` (or `node tests/cleanup-data.mjs [FM-… orders placed during the run]`): the API can't delete anything, so it sets the run's still-active test orders to REJECTED with a "Test data cleanup" reason. To set up by hand instead:
