@@ -1,6 +1,6 @@
-# Regression: 18 runs under `/goal`
+# Regression: 20 runs under `/goal`
 
-Goal: run `/run-regression` repeatedly (first `/goal` to 10 runs, then a second `/goal` towards 20), then report whether the Results column was identical across runs and what the skill learned. The second goal was stopped at 18 recorded runs to save tokens; a 19th run was started twice and abandoned (its orders were cleaned up, nothing recorded).
+Goal: run `/run-regression` until `history.md` has 20 runs (first a `/goal` to 10, then a second to 20), then report whether the Results column was identical across runs and what the skill learned. Run 19 was started twice and abandoned (user pause, tool outage) before the recorded attempt; nothing from those attempts is recorded and their orders were cleaned up.
 
 ## Was the output the same?
 
@@ -11,16 +11,17 @@ Goal: run `/run-regression` repeatedly (first `/goal` to 10 runs, then a second 
 | 3–16 | `FPPPP PPPPP PSPPP` | Identical in all 14 runs (5m04s–5m28s), across two days (2026-10-02 and 2026-10-05) |
 | 17 | `FPPPP FPPPP PSPPP` | FM-TC-06 FAIL: the app showed "Chef not found" for an existing chef (`/chef/17`); a reload fixed it. **App issue, transient** |
 | 18 | `FPPPP PPPPP PSPPP` | Back to the baseline (17m55s, including a pause while Claude Code's tool approval was down) |
+| 19–20 | `FPPPP PPPPP PSPPP` | Baseline (7m19s, 10m50s; slower because the browser extension needed one call per script) |
 
-**16 of 18 runs produced exactly the same result.** The two differences have different causes:
+**18 of 20 runs produced exactly the same result.** The two differences have different causes:
 
 - **Run 2: the agent.** A step ran too early; the skill learned from it and it never came back.
 - **Run 17: the app.** `apps/web/src/pages/Chef/index.tsx:71` shows "Chef not found" for any failed or slow chef request, not just a 404. The regression caught a real intermittent bug; it is now a known issue in `tests/cart.md` (FM-TC-06).
 
 Stable throughout:
 
-- **FM-TC-01 FAIL in all 18 runs:** real product bug ("6 chefs cooking near you" with 5 cards; `/api/chef/active` returns `count: 6` with 5 chefs). Consistent, so not flaky.
-- **FM-TC-12 SKIP in all 18 runs:** human-only (sign-in/out).
+- **FM-TC-01 FAIL in all 20 runs:** real product bug ("6 chefs cooking near you" with 5 cards; `/api/chef/active` returns `count: 6` with 5 chefs). Consistent, so not flaky.
+- **FM-TC-12 SKIP in all 20 runs:** human-only (sign-in/out).
 - Every other case PASS in every run, except the two above.
 
 ## What the skill learned (self-improvement)
@@ -40,12 +41,16 @@ Stable throughout:
 | Run 17 | No top-level `return` in browser scripts; wrap in `async` function | A lost result had hidden 3 placed orders |
 | Run 17 | "Chef not found" for a known chef → record FAIL with evidence, reload once, carry on | App bugs are reported, not retried away |
 | Run 18 | If tool calls stop being approved, stop, note the last step and any orders, resume from there | No duplicate orders after an outage |
+| Run 19 | When the extension needs permission per script, run scripts standalone; click **Remove item** via JavaScript, not `ref` | Run completed despite the changed browser permissions |
+| Run 20 | Never send dependent browser calls in parallel; check the cart is empty before placing an order | One wrong order (2× dish) caught, rejected and redone |
 
-Run duration fell from 8m33s (run 1) to ~5m20s (runs 3–16) as the procedure stabilised. The lessons list is in `.agents/skills/run-regression/SKILL.md` (13 entries, under the 20-line limit).
+Run duration fell from 8m33s (run 1) to ~5m20s (runs 3–16) as the procedure stabilised; runs 19–20 were slower only because the browser extension stopped allowing batched scripts. The lessons list is in `.agents/skills/run-regression/SKILL.md` (14 entries, under the 20-line limit).
+
+Note: every execution problem after run 2 (runs 17–20) changed *how* a step was carried out, never the recorded result: the agent recovered and recorded the result the app actually showed.
 
 ## Data
 
-Each run placed 3 orders in the signed-in customer's account (one delivered, one rejected, one rejected by cleanup). Aborted attempts (run 2, run 17, run 19) placed extra orders; all were rejected in cleanup. No chefs or dishes were changed.
+Each run placed 3 orders in the signed-in customer's account (one delivered, one rejected, one rejected by cleanup). Aborted or wrong attempts (runs 2, 17, 19, 20) placed extra orders; all were rejected in cleanup. No chefs or dishes were changed.
 
 ## Cost note
 
