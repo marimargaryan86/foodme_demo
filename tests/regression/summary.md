@@ -44,9 +44,21 @@ Stable throughout:
 | Run 19 | When the extension needs permission per script, run scripts standalone; click **Remove item** via JavaScript, not `ref` | Run completed despite the changed browser permissions |
 | Run 20 | Never send dependent browser calls in parallel; check the cart is empty before placing an order | One wrong order (2× dish) caught, rejected and redone |
 
-Run duration fell from 8m33s (run 1) to ~5m20s (runs 3–16) as the procedure stabilised; runs 19–20 were slower only because the browser extension stopped allowing batched scripts. The lessons list is in `.agents/skills/run-regression/SKILL.md` (14 entries, under the 20-line limit).
+Run duration fell from 8m33s (run 1) to ~5m20s (runs 3–16) as the procedure stabilised. Runs 17–20 reversed that trend (7–18 min), each with a new execution problem: see below.
 
 Note: every execution problem after run 2 (runs 17–20) changed *how* a step was carried out, never the recorded result: the agent recovered and recorded the result the app actually showed.
+
+## After run 20: from reactive lessons to structure
+
+Runs 17–20 showed the limit of adding a lesson after each failure: every run failed in a new way, because the agent retyped its browser scripts each time and sent dependent calls in parallel. The skill was changed structurally rather than with more lessons:
+
+- **Browser scripts are files** (`tests/regression/scripts/`, 16 scripts with a README). The agent fills in the parameters and passes the file to the browser tool; it never writes a script. The scripts were tested against the real storefront DOM and the admin app.
+- **Guards instead of reminders:** `place-order.js` refuses to click unless the cart holds exactly the expected lines (run 20's 2× order can't happen again), and `add-dish.js` can require an empty cart first.
+- **One browser call at a time**, each script as a standalone call, is now a rule in the procedure.
+- **Lessons folded into the procedure are deleted** from Lessons learned: the list went from 14 entries to 3 (limit 10). Only lessons not yet in the procedure stay (run 18 outage, run 17 "Chef not found", run 2 "not connected").
+- **Values, not just letters:** each run now records a fixed list of observed values per case, and history.md has a `Values` column, so a changed value under a PASS also counts as a difference.
+
+Not measured yet: the next `/goal` batch (runs 21+) should show whether durations return to ~5–6 min with no execution problems, and whether the observed values stay identical. Run 21 compares values with run 20, which has none, so the first value comparison is run 22.
 
 ## Data
 
@@ -54,4 +66,4 @@ Each run placed 3 orders in the signed-in customer's account (one delivered, one
 
 ## Cost note
 
-Each run is ~60–80 browser actions in one long conversation, so later runs cost more tokens than early ones. For future repeats, start each `/goal` batch in a fresh session and keep the step scripts in files instead of retyping them.
+Each run is ~60–80 browser actions in one long conversation, so later runs cost more tokens than early ones. For future repeats, start each `/goal` batch in a fresh session. The step scripts are now in files (see above), which also cuts the tokens spent retyping them.
