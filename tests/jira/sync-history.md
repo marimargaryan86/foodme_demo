@@ -14,3 +14,4 @@ To check consistency, run it repeatedly, e.g. `/goal Run /sync-jira-bugs until t
 | 6 | 2026-10-05 17:02 | 1m | 20 | 3 | 0 | 0 | 0 | 0 | `01=KAN-5 04=KAN-4 06=KAN-6` | none |
 | 7 | 2026-10-05 17:02:48 | 14s | 20 | 3 | 0 | 0 | 0 | 0 | `01=KAN-5 04=KAN-4 06=KAN-6` | none. Skill: start to the second and duration in seconds from a saved timestamp (syncs 4–6 were rounded to 1m) |
 | 8 | 2026-10-05 17:03:14 | 6s | 20 | 3 | 0 | 0 | 0 | 0 | `01=KAN-5 04=KAN-4 06=KAN-6` | none |
+| 9 | 2026-10-05 17:03:41 | 14s | 20 | 3 | 0 | 0 | 0 | 0 | `01=KAN-5 04=KAN-4 06=KAN-6` | none |
