@@ -10,3 +10,4 @@ To check consistency, run it repeatedly, e.g. `/goal Run /sync-jira-bugs until t
 | 2 | 2026-10-05 16:58 (corrected; was estimated as 17:00) | ~1m | 20 | 3 | 0 | 0 | 0 | 0 | `01=KAN-5 04=KAN-4 06=KAN-6` | none (no new run; all labels present). Skill: mapped tickets confirmed with one paired JQL instead of one getJiraIssue per ticket |
 | 3 | 2026-10-05 16:59 | 1m | 20 | 3 | 0 | 0 | 0 | 0 | `01=KAN-5 04=KAN-4 06=KAN-6` | none. Sync 2's start time had been estimated; corrected. Skill: start/duration now from `date -u` |
 | 4 | 2026-10-05 17:00 | 1m | 20 | 3 | 0 | 0 | 0 | 0 | `01=KAN-5 04=KAN-4 06=KAN-6` | none. Skill: one fixed collection command in step 2 (syncs 3 and 4 had used different greps) |
+| 5 | 2026-10-05 17:01 | 1m | 20 | 3 | 0 | 0 | 0 | 0 | `01=KAN-5 04=KAN-4 06=KAN-6` | none |
