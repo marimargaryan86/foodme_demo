@@ -1,6 +1,6 @@
-# Regression: 10 runs under `/goal`
+# Regression: 18 runs under `/goal`
 
-Goal: run `/run-regression` until `history.md` has 10 runs, then report whether the Results column was identical across runs and what the skill learned.
+Goal: run `/run-regression` repeatedly (first `/goal` to 10 runs, then a second `/goal` towards 20), then report whether the Results column was identical across runs and what the skill learned. The second goal was stopped at 18 recorded runs to save tokens; a 19th run was started twice and abandoned (its orders were cleaned up, nothing recorded).
 
 ## Was the output the same?
 
@@ -8,13 +8,20 @@ Goal: run `/run-regression` until `history.md` has 10 runs, then report whether 
 |---|---|---|
 | 1 | `FPPPP PPPPP PSPPP` | Baseline (8m33s) |
 | 2 | `FPPPP PPPPP PSPPE` | FM-TC-15 ERROR: dialog-close check ran too early in the background admin tab (execution, not the app) |
-| 3–10 | `FPPPP PPPPP PSPPP` | Identical in all 8 runs (5m14s–5m28s) |
+| 3–16 | `FPPPP PPPPP PSPPP` | Identical in all 14 runs (5m04s–5m28s), across two days (2026-10-02 and 2026-10-05) |
+| 17 | `FPPPP FPPPP PSPPP` | FM-TC-06 FAIL: the app showed "Chef not found" for an existing chef (`/chef/17`); a reload fixed it. **App issue, transient** |
+| 18 | `FPPPP PPPPP PSPPP` | Back to the baseline (17m55s, including a pause while Claude Code's tool approval was down) |
 
-**9 of 10 runs produced the identical result; the one difference (run 2) came from how the agent executed a step, not from the app, and disappeared once the skill learned from it.** The app itself behaved the same every time:
+**16 of 18 runs produced exactly the same result.** The two differences have different causes:
 
-- **FM-TC-01 FAIL in all 10 runs:** the real product bug ("6 chefs cooking near you" with 5 cards; `/api/chef/active` returns `count: 6` with 5 chefs). Consistent, so not flaky.
-- **FM-TC-12 SKIP in all 10 runs:** human-only (sign-in/out).
-- Everything else PASS in every completed check.
+- **Run 2: the agent.** A step ran too early; the skill learned from it and it never came back.
+- **Run 17: the app.** `apps/web/src/pages/Chef/index.tsx:71` shows "Chef not found" for any failed or slow chef request, not just a 404. The regression caught a real intermittent bug; it is now a known issue in `tests/cart.md` (FM-TC-06).
+
+Stable throughout:
+
+- **FM-TC-01 FAIL in all 18 runs:** real product bug ("6 chefs cooking near you" with 5 cards; `/api/chef/active` returns `count: 6` with 5 chefs). Consistent, so not flaky.
+- **FM-TC-12 SKIP in all 18 runs:** human-only (sign-in/out).
+- Every other case PASS in every run, except the two above.
 
 ## What the skill learned (self-improvement)
 
@@ -25,13 +32,21 @@ Goal: run `/run-regression` until `history.md` has 10 runs, then report whether 
 | Run 2 | Set form values with the native setter + `input` event | No more retries on checkout/search/reject reason |
 | Run 2 | Open admin orders by URL (`#/orders/<number − 100000>/show`) | Admin list ordering no longer matters |
 | Run 2 | Background admin tab throttles timers: short scripts + waits; wait ≥ 3 s after Cancel | Fixed FM-TC-15 ERROR → PASS from run 3 on |
-| Run 2 | Reload the storefront before reading anything an admin action changed | Prevents stale "Received" badge |
+| Run 2 | Reload the storefront before reading anything an admin action changed | Prevents a stale "Received" badge |
 | Run 2 | Match statuses by full text, not single words | Prevents matching the progress bar |
 | Run 2 | A "not connected" browser call may still have run: check order numbers before restarting | 3 stray orders found and cleaned up |
-| Run 10 | Folded the proven lessons into the main procedure | Next runs follow them by default |
+| Run 10 | Folded the proven lessons into the main procedure | Runs 11–16 had no execution problems |
+| Run 17 | Pick dishes by name ("Mushroom soup"), never "the first card" | Card order isn't stable while the page loads; fixed data stays fixed |
+| Run 17 | No top-level `return` in browser scripts; wrap in `async` function | A lost result had hidden 3 placed orders |
+| Run 17 | "Chef not found" for a known chef → record FAIL with evidence, reload once, carry on | App bugs are reported, not retried away |
+| Run 18 | If tool calls stop being approved, stop, note the last step and any orders, resume from there | No duplicate orders after an outage |
 
-Run duration fell from 8m33s (run 1) to ~5m20s (runs 4–10) as the procedure stabilised.
+Run duration fell from 8m33s (run 1) to ~5m20s (runs 3–16) as the procedure stabilised. The lessons list is in `.agents/skills/run-regression/SKILL.md` (13 entries, under the 20-line limit).
 
 ## Data
 
-Each run placed 3 orders in the signed-in customer's account (one delivered, one rejected, one rejected by cleanup); the aborted run-2 attempt placed 3 more, also rejected. No chefs or dishes were changed.
+Each run placed 3 orders in the signed-in customer's account (one delivered, one rejected, one rejected by cleanup). Aborted attempts (run 2, run 17, run 19) placed extra orders; all were rejected in cleanup. No chefs or dishes were changed.
+
+## Cost note
+
+Each run is ~60–80 browser actions in one long conversation, so later runs cost more tokens than early ones. For future repeats, start each `/goal` batch in a fresh session and keep the step scripts in files instead of retyping them.
