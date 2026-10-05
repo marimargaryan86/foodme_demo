@@ -17,3 +17,4 @@ To check consistency, run it repeatedly, e.g. `/goal Run /run-regression until t
 | 9 | 2026-10-02 16:39 | 5m23s | 13 | 1 | 1 | 0 | `FPPPP PPPPP PSPPP` | none |
 | 10 | 2026-10-02 16:44 | 5m25s | 13 | 1 | 1 | 0 | `FPPPP PPPPP PSPPP` | none |
 | 11 | 2026-10-05 12:20 | 5m18s | 13 | 1 | 1 | 0 | `FPPPP PPPPP PSPPP` | none |
+| 12 | 2026-10-05 12:26 | 5m4s | 13 | 1 | 1 | 0 | `FPPPP PPPPP PSPPP` | none |
