@@ -19,12 +19,12 @@ Goal of every run: **the same app gives the same table.** Follow the steps below
 
 ## 1. Preflight
 
-1. `node tests/prepare-data.mjs --dry-run`: wakes the app (creates nothing).
+1. `node tests/prepare-data.mjs --dry-run`: wakes the app (creates nothing). The free-tier app sleeps after ~15 min, so never skip this.
 2. Use the **Claude in Chrome** tools (`mcp__claude-in-chrome__*`), not the built-in browser pane: only the user's Chrome has the signed-in sessions. If the tools are deferred, load them first with one ToolSearch call (`select:` the tools you need, including `browser_batch`). If the extension isn't connected, stop and tell the user; don't fall back to another browser.
 3. `tabs_context_mcp` (create the group if needed). Use one storefront tab and one admin tab; open them if missing.
 4. Storefront tab, open `/orders`: must show **Your orders** and a header link named "Account, …". Admin tab, open `/backoffice/#/orders`: must show the **Orders** menu item.
 5. If either session is missing, **stop**: don't record a run. Tell the user which one to sign in to (once; sessions don't expire) and end.
-6. Empty the cart (Remove item on every cart line) so every run starts the same.
+6. Empty the cart (click **Remove item** via JavaScript on every cart line) so every run starts the same.
 
 ## 2. Run the cases in this order, with this data
 
@@ -47,7 +47,17 @@ Goal of every run: **the same app gives the same table.** Follow the steps below
 
 Receiver details on checkout: keep what's prefilled; if empty use `QA Regression`, `+37490000000`, the signed-in email.
 
-**How to drive the pages** (proven over runs 3–10, see Lessons learned): set field values in JavaScript (native setter + `input` event), never by typing at coordinates; open admin orders at `#/orders/<number − 100000>/show`; one short script per admin action with 3–5 s `computer` waits between them; navigate the storefront fresh before reading anything that an admin action changed; match statuses by their full text.
+**How to drive the pages** (proven over runs 1–20):
+
+- *Setting values:* never type at screen coordinates (`ref` clicks don't focus inputs, and fields move when validation messages change). Set values in JavaScript: find the field by its label (`input:not([type=radio])` whose `labels[0].innerText` matches), then `Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,v); el.dispatchEvent(new Event('input',{bubbles:true}))`. Use `HTMLTextAreaElement` for the MUI rejection reason. Header search: set the value, then `form.requestSubmit()`.
+- *Clicking:* clicking a header link by `ref` sometimes doesn't navigate; click by coordinates from a fresh screenshot or call `.click()` via JavaScript. Click **Remove item** via JavaScript only (a `ref` click can silently do nothing).
+- *Waiting:* every API call adds 0.2–1.5 s, so poll for the element (`aside.uc-panel`, `button.dc_card`, `[role=dialog]`) instead of assuming it is there.
+- *Dishes:* pick them by name ("Mushroom soup"), never "the first `button.dc_card`": the card order isn't stable while the chef page loads (TC-10 once got "Rice").
+- *Admin orders:* open them at `#/orders/<number − 100000>/show` and check the `h5` heading matches the order number (the admin list isn't reliably newest-first). Read the status from `.MuiChip-label`. MUI dialogs hide the page from the accessibility tree: close the dialog before checking the status chip.
+- *Admin timing:* the admin tab runs in the background, so its timers are throttled. One short script per admin action, with `computer` waits of 3–5 s between them; after **Cancel** wait at least 3 s before checking the dialog is gone.
+- *After an admin action:* **navigate** the storefront fresh (`/orders` or the tracking page) before reading anything it changed; never read a page that was loaded before the change.
+- *Statuses:* match them by their full text ("Preparing your order", "Delivered" + "Enjoy your meal", "Order declined"); single words also match the progress bar ("Received | Preparing | Delivered").
+- *Closing tabs:* after `tabs_close_mcp` inside a batch, later actions in that batch fail ("not in the same group"). End the batch after closing, then call `tabs_context_mcp`.
 
 **Result per case:** `PASS` (every agent-run step matched), `FAIL` (a step didn't match: record the step number and the actual text), `SKIP` (no agent-run steps), `ERROR` (couldn't execute a step, e.g. element not found after retries: record why). Partly human-only cases are PASS/FAIL on their agent-run steps. A case with a **Known issue** in its file still reports FAIL when that step fails; add "known issue" in the note.
 
@@ -69,35 +79,19 @@ Receiver details on checkout: keep what's prefilled; if empty use `QA Regression
 
 ## 5. Improve this skill
 
-Read this run's **Execution problems** and **Changes vs previous run**. For each problem that came from *how* the run was executed (not from the app), add or update one line in **Lessons learned** below: what happened and what to do instead, dated. Merge duplicates, keep the list under 20 lines, and delete lessons that turned out wrong. Then make the steps above follow the lesson if it changes the procedure. Don't add lessons about app bugs; those belong in the case files.
+Read this run's **Execution problems** and **Changes vs previous run**. For each problem that came from *how* the run was executed (not from the app), add or update one line in **Lessons learned** below: what happened and what to do instead, dated. Merge duplicates, keep the list at 10 lines or fewer (newest first), and delete lessons that turned out wrong. Then make the steps above follow the lesson if it changes the procedure. When a lesson is folded into the procedure, delete it from Lessons learned in the same edit. Don't add lessons about app bugs; those belong in the case files.
 
 ## 6. Report
 
 Show the run table, the history row, and the changes vs previous run. If the run was started by a `/goal`, end with the run number so the goal check can count.
 
-## Known pitfalls (from building this skill)
-
-- The app sleeps after ~15 min; the dry run in preflight wakes it.
-- Every API call adds 0.2–1.5 s: poll for elements (`aside.uc-panel`, `button.dc_card`, `[role=dialog]`) instead of assuming they're there.
-- Clicking a header link by `ref` sometimes doesn't navigate; click by coordinates from a fresh screenshot or call `.click()` on the element via JavaScript.
-- After `tabs_close_mcp` inside a batch, later actions in the same batch fail ("not in the same group"): end the batch after closing and call `tabs_context_mcp`.
-- MUI dialogs hide the page from the accessibility tree: close the dialog before checking the status chip.
-- Admin: read the status from `.MuiChip-label`; order pages are `#/orders/<id>/show`.
-
 ## Lessons learned
 
-- 2026-10-05 (run 17): Pick dishes by name ("Mushroom soup"), never "first `button.dc_card`": the card order isn't stable while the chef page loads (TC-10 got "Rice" once).
+Only lessons that aren't in the procedure above yet; newest first.
+
+- 2026-10-05 (run 20): Never send dependent browser calls in parallel. If one fails, the next runs on the wrong page (a placed order got 2× the dish). Run them in sequence, and before placing an order check that the cart counter is `0` (the TC-09–11 scripts return `cart not empty` otherwise).
+- 2026-10-05 (run 19): If `browser_batch` fails with `permission_required` on `javascript_tool`, run each script as a standalone call, and keep batches for read-only `navigate`/`find`/`get_page_text`.
+- 2026-10-05 (run 18): If tool calls stop being approved (e.g. auto mode "no verdict"), stop retrying after a few attempts, note the last step that finished and whether any order was placed, and resume from the next step when tools work again. Don't restart the run (that would place extra orders), and note the pause in Execution problems, since the duration includes it.
 - 2026-10-05 (run 17): Never use a top-level `return` in `javascript_exec`: the script runs (orders get placed!) but the result is `undefined`. Wrap guarded logic in `const run = async () => {…}; await run()`.
 - 2026-10-05 (run 17): If a chef page shows "Chef not found" for a known chef, that's the app's error handling (any failed request shows it). Record the case as FAIL with the evidence, then reload once so the remaining steps still run; don't retry silently until it passes.
-- 2026-10-05 (run 18): If tool calls stop being approved (e.g. auto mode "no verdict"), stop retrying after a few attempts, note the last step that finished and whether any order was placed, and resume from the next step when tools work again. Don't restart the run (that would place extra orders), and note the pause in Execution problems, since the duration includes it.
-- 2026-10-05 (run 19): If `browser_batch` fails with `permission_required` on `javascript_tool`, run each script as a standalone call, and keep batches for read-only `navigate`/`find`/`get_page_text`. Click **Remove item** via JavaScript only; a `ref` click can silently do nothing.
-- 2026-10-05 (run 20): Never send dependent browser calls in parallel. If one fails, the next runs on the wrong page (a placed order got 2× the dish). Run them in sequence, and before placing an order check that the cart counter is `0` (the TC-09–11 scripts return `cart not empty` otherwise).
-- 2026-10-02 (runs 3–10): With the lessons below applied, 8 runs in a row had no execution problems and identical results (`FPPPP PPPPP PSPPP`, ~5m20s each, down from 8m33s in run 1). Keep them; add new ones only when a run reports an execution problem.
-
-- 2026-10-02 (runs 1–2): Don't type into fields at screen coordinates (refs don't focus inputs; fields move when validation messages change). Set values in JavaScript with the native setter and an `input` event: `Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,v); el.dispatchEvent(new Event('input',{bubbles:true}))` (use `HTMLTextAreaElement` for the MUI rejection reason). Find fields by label: `input:not([type=radio])` whose `labels[0].innerText` matches. Header search: set the value, then `form.requestSubmit()`.
-- 2026-10-02 (run 1): Cleanup must use `--only`, or it also touches the manual-session orders in `tests/.run-data.md`.
-- 2026-10-02 (run 2): Open admin orders directly at `#/orders/<id>/show` (id = order number − 100000) and check the `h5` heading matches; the admin list isn't reliably newest-first.
-- 2026-10-02 (run 2): The admin tab runs in the background, so its timers are throttled: keep each admin script short (one action), put `computer` waits of 3–5 s between them, and after **Cancel** wait at least 3 s before checking the dialog is gone.
-- 2026-10-02 (run 2): After any admin status change, **navigate** the storefront to `/orders` (fresh load) before reading badges; never read a page that was loaded before the change.
-- 2026-10-02 (run 2): Match tracking status by its full text ("Preparing your order", "Delivered" + "Enjoy your meal", "Order declined"); single words also match the progress bar ("Received | Preparing | Delivered").
 - 2026-10-02 (run 2): If a browser call reports "not connected", it may still have executed. Before restarting, check the latest order numbers (API `GET /api/order/number/FM-…` for the next numbers) and add any orders it created to cleanup.
