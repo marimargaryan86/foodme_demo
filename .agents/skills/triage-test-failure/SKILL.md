@@ -38,7 +38,7 @@ Read the failing spec and the code under test, then pick exactly one category:
 |---|---|
 | **Environment** | Step 1 found a problem; the failure is about connections, cold starts or overload, not assertions |
 | **Flaky** | Passes on rerun (`--repeat-each=3`); timing-dependent; fixed waits; it's a `flake-*` spec |
-| **Test bug** | Wrong or stale locator, wrong expectation, shared or hardcoded data, wrong URL, the test breaks `.claude/rules/e2e-tests.md` |
+| **Test bug** | Wrong or stale locator, wrong expectation, shared or hardcoded data, wrong URL, the test breaks `.agents/rules/e2e-tests.md` |
 | **Product bug** | The test's expectation matches the intended behavior and the deployed app does something else, reproducibly |
 
 The deployed build can lag behind local source. If a locator matches local code but not the live page, the deploy is out of date; say so rather than calling it a test bug.

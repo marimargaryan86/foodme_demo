@@ -29,7 +29,7 @@ The free-tier service sleeps after ~15 minutes and takes up to a minute to wake.
 
 ## 3. Write the test
 
-Follow `.claude/rules/e2e-tests.md`: role/label locators, existing helpers, no fixed waits, auto-waiting `expect`, longer timeouts on API-backed assertions, a fresh customer per test, no changes to shared seed data, and relative `#/...` URLs in admin specs. Name the file `<area>-<flow>.spec.ts`, and never start the name with `flake-`.
+Follow `.agents/rules/e2e-tests.md`: role/label locators, existing helpers, no fixed waits, auto-waiting `expect`, longer timeouts on API-backed assertions, a fresh customer per test, no changes to shared seed data, and relative `#/...` URLs in admin specs. Name the file `<area>-<flow>.spec.ts`, and never start the name with `flake-`.
 
 ## 4. Run it three times
 
