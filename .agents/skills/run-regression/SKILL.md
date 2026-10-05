@@ -92,10 +92,69 @@ Plain reads (`get_page_text`, `find`) are fine for anything a script doesn't cov
 2. Write `tests/regression/runs/run-NNN.md`:
    - header: run number, UTC start time, duration, app URL;
    - table `| Case | Result | Note |` for FM-TC-01 … FM-TC-15 in ID order (notes: failing step + actual text, order numbers, "known issue");
-   - **Changes vs previous run:** each case whose result changed, or "none";
+   - **Observed values:** one `key=value` line per key in the list below, in that order, in a fenced block. Every run uses exactly these keys; never add, rename or drop one. A key you couldn't observe (SKIP, ERROR, a step that didn't run) is `n/a`.
+   - **Changes vs previous run:** compare the result letters **and every observed value** with the previous run's file. List each case whose result changed, and each key whose value changed as `key: old → new`. A changed value under a PASS counts as a change. If the previous run has no Observed values section (runs 1–20), write "values: n/a (previous run has none)" and compare letters only. Otherwise "none".
    - **Proposed case fixes:** or "none";
    - **Execution problems:** retries, timeouts, workarounds, or "none".
-3. Append one row to `tests/regression/history.md`. The `Results` column is 15 letters in case order 01–15 (`P`, `F`, `S`, `E`), grouped by 5: e.g. `FPPPP PPPPP PSPPP`.
+3. Append one row to `tests/regression/history.md`. The `Results` column is 15 letters in case order 01–15 (`P`, `F`, `S`, `E`), grouped by 5: e.g. `FPPPP PPPPP PSPPP`. The `Values` column is `same` (no key changed), the number of changed keys (e.g. `2`), or `n/a` when the previous run has no values.
+
+### Observed values: the fixed key list
+
+Format: `TCnn.key=value`. Numbers are plain digits (`6300`, no commas or "AMD"); lists are comma-separated without spaces; text is in double quotes, copied from the page with whitespace collapsed to single spaces; `true`/`false` for yes/no. Never record order numbers (they differ every run). Most values are what the scripts in `tests/regression/scripts/` return.
+
+```
+TC01.cards_count            read-explore.js cards_count
+TC01.header_count           read-explore.js header_count
+TC01.card_delivery          distinct card delivery texts, joined with "|", e.g. "500 AMD delivery"
+TC02.sakura_names           names after the search for Sakura, e.g. "Sakura Kitchen"
+TC02.sakura_upper_names     names after the search for SAKURA
+TC02.nomatch_text           "No chefs match" (or what the page shows)
+TC02.cleared_cards_count    cards after Clear filters
+TC03.price_steps            add-dish.js price_steps, e.g. 2000,2100,2000,2100
+TC03.cart_line              line text in the cart, e.g. "Chuka Wakame Salad + Soy Sauce 2100"
+TC03.subtotal               read-cart.js subtotal
+TC04.quantities             quantity after each click, e.g. 3,2,1
+TC04.subtotal_at_3          subtotal at quantity 3
+TC04.item_kept_at_1         true/false (item still in cart at quantity 1)
+TC04.empty_text             text after Remove item, e.g. "Your cart is empty"
+TC05.counter_after_reload   header counter after reload
+TC05.counter_new_tab        header counter in the new tab
+TC06.dialog_title           "Switch kitchens?"
+TC06.cart_after_keep        number of cart lines after Keep cart & browse
+TC06.cart_after_clear       cart line names after Clear & continue
+TC06.unknown_chef_text      text on /chef/999999, e.g. "Chef not found"
+TC07.delivery_low           delivery fee at the low subtotal (number or "Free")
+TC07.hint_low               hint at quantity 1, e.g. "Add 2,900 AMD more"
+TC07.delivery_high          delivery at quantity 3, e.g. "Free"
+TC07.hint_back              hint after decreasing to quantity 2, e.g. "Add 800 AMD more"
+TC08.empty_checkout_text    e.g. "Nothing to check out"
+TC08.browse_button          true/false ("Browse chefs" button present)
+TC09.heading                "Order placed!"
+TC09.success_buttons        e.g. "Track order|View my orders|Back to explore"
+TC09.counter_after          header counter after ordering
+TC09.tracking_title         e.g. "Order received"
+TC10.delivery_fee           fee with Delivery selected (number or "Free")
+TC10.takeaway_fee           fee with Takeaway selected
+TC10.takeaway_total         total with Takeaway selected
+TC10.address_fields_takeaway  true/false
+TC11.messages               number of messages on the empty form
+TC11.messages_invalid       number after the invalid values (A, 123, bad-email)
+TC11.messages_takeaway      number after switching to Takeaway
+TC11.result_heading         heading after valid values, e.g. "Order placed!"
+TC12.skip_reason            "human-only"
+TC13.badge                  badge on Your orders, e.g. "Received"
+TC13.tracking_title         e.g. "Order received"
+TC13.api_status             HTTP status of GET /api/order/number/<FM-…> without a token
+TC13.unknown_order_text     text for FM-0000000, e.g. "Couldn’t load this order"
+TC14.status_new             admin status when opened
+TC14.after_accept           "<admin status> | <customer badge> | <tracking title>"
+TC14.after_deliver          "<admin status> | <customer badge> | <tracking title>"
+TC14.actions_final          number of "Mark as …" buttons after DELIVERED
+TC15.empty_reason_error     e.g. "A rejection reason is required"
+TC15.status_after_cancel    admin status after Cancel
+TC15.status_final           admin status after the reason is entered
+TC15.customer_final         "<tracking title> | <customer badge>"
+```
 
 ## 4. Clean up
 
