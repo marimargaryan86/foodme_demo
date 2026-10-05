@@ -13,10 +13,16 @@ FoodMe is a food-ordering demo app for a QA course. It runs as a single Render f
 
 ## Agent config
 
-- `.agents/skills/`: agent-neutral skills (`SKILL.md` per folder), usable by any coding agent that reads `.agents/`. `write-e2e-test` writes a Playwright spec and runs it 3× against prod; `triage-test-failure` classifies a failing test and drafts a bug report; `prepare-test-data` wakes prod and creates the data for the manual cases in `tests/` (via `tests/prepare-data.mjs`); `cleanup-test-data` rejects that run's still-active test orders afterwards (via `tests/cleanup-data.mjs`; nothing can be deleted through the API); `run-regression` runs the manual cases in a browser and records results in `tests/regression/`.
+- `.agents/skills/`: agent-neutral skills (`SKILL.md` per folder), usable by any coding agent that reads `.agents/`. This is the single list of them:
+  - `/write-e2e-test <flow>`: manual only. Checks the deployed app is awake, writes a Playwright spec, runs it against the deployed app with `--repeat-each=3` and flags flakiness.
+  - `triage-test-failure`: classifies failing test output as product bug, test bug, flaky or environment, and drafts a bug report.
+  - `/prepare-test-data [--dry-run]`: manual only. Wakes the deployed app and creates the customer and orders the manual cases in `tests/` need (`tests/prepare-data.mjs`).
+  - `/cleanup-test-data [FM-… numbers] [--dry-run]`: manual only. Ends a test session: sets the run's still-active test orders to REJECTED (the API can't delete) and closes the browser tabs the agent opened (`tests/cleanup-data.mjs`).
+  - `run-regression`: runs the agent-runnable steps of all 15 manual cases in a browser (needs a signed-in customer and admin there, once), records the result in `tests/regression/history.md` + `runs/`, compares with the previous run, cleans up and adds lessons to its own `Lessons learned`. Model-invocable so `/goal` can repeat it.
+- `.agents/rules/`: path-scoped rules that load when the agent works on matching files. `e2e-tests.md`: `apps/web/e2e/` and `apps/admin/e2e/` (prod target, test data, locators, waiting). `admin-e2e.md`: `apps/admin/e2e/` only (relative `#/` routes under `/backoffice/`, MUI locators, admin helpers).
 - `.claude/skills` is a symlink to `.agents/skills`, so Claude Code loads the same files. Edit skills in `.agents/skills/` only.
-- `.agents/rules/` (path-scoped rules) and `.agents/hooks/` (tool hooks) work the same way: `.claude/rules` and `.claude/hooks` are symlinks to them. Edit rules and hooks in `.agents/` only.
-- Windows: the symlinks only check out as links with symlink permission (Developer Mode on, or an admin shell) and `git clone -c core.symlinks=true …`. Otherwise they arrive as small text files and Claude Code sees no skills, rules or hooks; run `powershell -ExecutionPolicy Bypass -File scripts\link-agents-windows.ps1` once after cloning to replace them with directory junctions (no admin needed).
+- `.agents/hooks/` (tool hooks) and the rules above work the same way: `.claude/rules` and `.claude/hooks` are symlinks to them. Edit rules and hooks in `.agents/` only.
+- `CLAUDE.md` is a symlink to this file, so AGENTS.md is the single source of truth: edit it here, never in `CLAUDE.md`. Claude Code-specific notes live in this file too: PRs are auto-reviewed by `anthropics/claude-code-action` (`.github/workflows/claude-pr-review.yml`, needs the `ANTHROPIC_API_KEY` secret; edit its `prompt:` to change what gets reviewed).
 
 ## Commands
 
