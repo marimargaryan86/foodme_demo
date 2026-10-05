@@ -37,7 +37,7 @@ For each: case ID, title, case file, the Known issue text or failing note, the n
 
 In this order, stop at the first hit:
 
-1. The ticket key in `tests/jira/bugs.md` for that case. `getJiraIssue` it (summary, status, labels).
+1. The ticket key in `tests/jira/bugs.md` for that case. Confirm all mapped pairs in **one** JQL: `project = KAN AND ((key = KAN-5 AND labels = "fm-tc-01" AND labels = "foodme") OR (key = … ))`. Each returned key confirms that pair's labels and gives its status; only for a key that is missing from the result, `getJiraIssue` it to see why (label missing, or the ticket moved/deleted).
 2. JQL `project = KAN AND labels = "fm-tc-NN"` (lower case, e.g. `fm-tc-06`).
 3. JQL `project = KAN AND text ~ "<2–4 distinctive words from the known issue>" ORDER BY created DESC`. A hit here is only a match if its summary or description clearly describes the same bug; if unsure, don't match: list it under **Needs a decision** and don't create a ticket for that case.
 

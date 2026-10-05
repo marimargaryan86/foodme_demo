@@ -7,3 +7,4 @@ To check consistency, run it repeatedly, e.g. `/goal Run /sync-jira-bugs until t
 | Sync | Started (UTC) | Duration | Regression run | Cases | Created | Labelled | Commented | Jira writes | Map | Changes vs previous |
 |---|---|---|---|---|---|---|---|---|---|---|
 | 1 | 2026-10-05 16:54 | 4m | 20 | 3 | 1 | 2 | 0 | 3 | `01=KAN-5 04=KAN-4 06=KAN-6` | first sync: created KAN-6 (FM-TC-06); labelled KAN-5, KAN-4 with fm-tc-NN + foodme. Skill: label edits now read labels via getJiraIssue first (JQL results omit them); lookups in one JQL |
+| 2 | 2026-10-05 17:00 | 2m | 20 | 3 | 0 | 0 | 0 | 0 | `01=KAN-5 04=KAN-4 06=KAN-6` | none (no new run; all labels present). Skill: mapped tickets confirmed with one paired JQL instead of one getJiraIssue per ticket |
