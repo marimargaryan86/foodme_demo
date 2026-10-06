@@ -8,3 +8,4 @@ To check consistency, run it repeatedly, e.g. `/goal Run /run-regression until t
 
 | Run | Started (UTC) | Duration | Pass | Fail | Skip | Error | Results | Values | Changes vs previous |
 |---|---|---|---|---|---|---|---|---|---|
+| 1 | 2026-10-06 10:46 | 26m50s | 13 | 1 | 1 | 0 | `FPPPP PPPPP PSPPP` | n/a | first run |
