@@ -12,3 +12,13 @@ Each sync runs in its own forked subagent. Run the batch of 10 with (type `/goal
 
 | Sync | Started (UTC) | Duration | Regression run | Cases | Created | Labelled | Commented | Jira writes | Map | Changes vs previous |
 |---|---|---|---|---|---|---|---|---|---|---|
+| 1 | 15:50:05 | 19s | run-010 | 3 | 0 | 0 | 1 | 1 | 01=KAN-5 04=KAN-4 06=KAN-6 | commented KAN-6 (FM-TC-06 passed in run 10); map and statuses unchanged |
+| 2 | 15:50:34 | 10s | run-010 | 3 | 0 | 0 | 0 | 0 | 01=KAN-5 04=KAN-4 06=KAN-6 | none (run-010 already recorded; map and statuses unchanged) |
+| 3 | 15:50:53 | 9s | run-010 | 3 | 0 | 0 | 0 | 0 | 01=KAN-5 04=KAN-4 06=KAN-6 | none (run-010 already recorded; map and statuses unchanged) |
+| 4 | 15:51:11 | 13s | run-010 | 3 | 0 | 0 | 0 | 0 | 01=KAN-5 04=KAN-4 06=KAN-6 | none (run-010 already recorded; map and statuses unchanged) |
+| 5 | 15:51:33 | 15s | run-010 | 3 | 0 | 0 | 0 | 0 | 01=KAN-5 04=KAN-4 06=KAN-6 | none (run-010 already recorded; map and statuses unchanged) |
+| 6 | 15:51:57 | 11s | run-010 | 3 | 0 | 0 | 0 | 0 | 01=KAN-5 04=KAN-4 06=KAN-6 | none (run-010 already recorded; map and statuses unchanged) |
+| 7 | 15:52:16 | 10s | run-010 | 3 | 0 | 0 | 0 | 0 | 01=KAN-5 04=KAN-4 06=KAN-6 | none (run-010 already recorded; map and statuses unchanged) |
+| 8 | 15:52:35 | 9s | run-010 | 3 | 0 | 0 | 0 | 0 | 01=KAN-5 04=KAN-4 06=KAN-6 | none (run-010 already recorded; map and statuses unchanged) |
+| 9 | 15:52:54 | 9s | run-010 | 3 | 0 | 0 | 0 | 0 | 01=KAN-5 04=KAN-4 06=KAN-6 | none (run-010 already recorded; map and statuses unchanged) |
+| 10 | 15:53:11 | 8s | run-010 | 3 | 0 | 0 | 0 | 0 | 01=KAN-5 04=KAN-4 06=KAN-6 | none (run-010 already recorded; map and statuses unchanged) |
