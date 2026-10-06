@@ -31,7 +31,7 @@ What the script does, and doesn't:
 
 ## 3. Close the browser tabs
 
-Close every tab Claude opened in its browser tab group for this run (`tabs_context_mcp`, then `tabs_close_mcp` for each). Don't touch the user's own tabs.
+Close every tab Claude opened for this run, in the browser the run used: Playwright MCP (`browser_tabs` `list`, then `close` by index, or `browser_close` for the whole browser; the sign-ins stay in its profile) or Claude in Chrome (`tabs_context_mcp`, then `tabs_close_mcp` for each). Don't touch the user's own tabs.
 
 ## 4. Report
 

@@ -63,3 +63,7 @@ infra/docker-compose.local.yml
 
 # Per-run manual test data (tests/prepare-data.mjs)
 tests/.run-data.md
+
+# Playwright MCP (.mcp.json): browser profile with the signed-in sessions, and its output files
+.playwright-profile/
+.playwright-mcp/
