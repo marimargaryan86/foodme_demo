@@ -201,6 +201,7 @@ Needs the user: <e.g. sign-in missing, an order left active, Playwright tools un
 
 Only lessons that aren't in the procedure above yet; newest first.
 
+- 2026-10-06 (run 10): Short-lived toasts/alerts ("Order status updated", "A rejection reason is required") are gone by the time `browser_wait_for` times out (5 s). Right after the click, call `browser_find` with the text (it caught the alert); otherwise confirm via the status chip. Admin id = number − 100000 (FM-100130 is `130`): compute it before navigating. Don't fire a snapshot and a click in the same parallel block ("Ref not found").
 - 2026-10-06 (run 5): `cleanup-data.mjs --only` takes space-separated order numbers (`--only FM-1 FM-2 FM-3`); a comma list prints "Nothing to clean up" and rejects nothing.
 - 2026-10-06 (run 4): Keep `browser_find` patterns narrow: a loose regex such as `button \[ref` on a chef page returns the whole menu. Names set by `aria-label` (e.g. **Remove item**) aren't page text, so find them with `button "Remove item"`, not plain text. Text values in the observed-values block need double quotes (including TC14 `after_accept`/`after_deliver`), or `finish` reports a false change.
 - 2026-10-06 (run 1): Admin order id = order number minus 100000 (FM-100103 is `103`, not `3`). After a header search, refs for the search box change: `browser_find` "searchbox" again before the next search. A click can fail with "Ref not found" right after the page re-rendered; re-find the ref and click once (verify nothing was placed first).
