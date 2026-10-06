@@ -52,13 +52,17 @@ Note: every execution problem after run 2 (runs 17–20) changed *how* a step wa
 
 Runs 17–20 showed the limit of adding a lesson after each failure: every run failed in a new way, because the agent retyped its browser scripts each time and sent dependent calls in parallel. The skill was changed structurally rather than with more lessons:
 
-- **Browser scripts are files** (`tests/regression/scripts/`, 16 scripts with a README). The agent fills in the parameters and passes the file to the browser tool; it never writes a script. The scripts were tested against the real storefront DOM and the admin app.
-- **Guards instead of reminders:** `place-order.js` refuses to click unless the cart holds exactly the expected lines (run 20's 2× order can't happen again), and `add-dish.js` can require an empty cart first.
-- **One browser call at a time**, each script as a standalone call, is now a rule in the procedure.
+- **Browser scripts were saved as files** (16 scripts with a README; later removed, see below). The agent filled in the parameters and passed the file to the browser tool instead of writing a script.
+- **Guards instead of reminders:** placing an order required the cart to hold exactly the expected lines (run 20's 2× order), first in a script, now as an explicit check in the skill.
+- **One state-changing browser call at a time** is now a rule in the procedure.
 - **Lessons folded into the procedure are deleted** from Lessons learned: the list went from 14 entries to 3 (limit 10). Only lessons not yet in the procedure stay (run 18 outage, run 17 "Chef not found", run 2 "not connected").
 - **Values, not just letters:** each run now records a fixed list of observed values per case, and history.md has a `Values` column, so a changed value under a PASS also counts as a difference.
 
 These changes were made after the 20 runs and weren't measured with another batch; the 20 runs above are the evidence for this exercise. A future `/goal` batch would show whether durations return to ~5–6 min with no execution problems and whether the observed values stay identical (run 21 would compare values with run 20, which has none, so the first value comparison would be run 22).
+
+## Later: back to the browser's own tools (no JavaScript)
+
+After the review, the browser scripts were removed again on purpose: the regression now drives Chrome only with the extension's page tools (`find`, `read_page`, `form_input`, `computer`, `get_page_text`), the way a tester would, with no JavaScript in the page. The safety checks the scripts did in code are now explicit read-then-act steps in the skill: the cart must be empty before adding, `/checkout` must show exactly `1×` "Mushroom soup" before **Place order**, every click is followed by a read that confirms it worked, and data-changing clicks are never batched or run in parallel. This trades the scripts' determinism for a run that needs no code in the page; the next `/goal` batch would show what that costs in consistency.
 
 ## Data
 
@@ -66,4 +70,4 @@ Each run placed 3 orders in the signed-in customer's account (one delivered, one
 
 ## Cost note
 
-Each run is ~60–80 browser actions in one long conversation, so later runs cost more tokens than early ones. For future repeats, start each `/goal` batch in a fresh session. The step scripts are now in files (see above), which also cuts the tokens spent retyping them.
+Each run is ~60–80 browser actions in one long conversation, so later runs cost more tokens than early ones. For future repeats, start each `/goal` batch in a fresh session. 

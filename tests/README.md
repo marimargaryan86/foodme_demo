@@ -38,7 +38,7 @@
 
 ## Agent runs (regression)
 
-`/run-regression` runs the agent-runnable steps of all 15 cases in Claude's Chrome tab group and records the result in [regression/history.md](regression/history.md). It needs a signed-in customer and a signed-in admin in that browser, done once by a person: sessions don't expire, and the agent never signs out. Steps marked human-only (signing in/out, creating accounts, private windows) are reported as `SKIP`.
+`/run-regression` runs the agent-runnable steps of all 15 cases in Claude's Chrome tab group, clicking and reading the pages like a tester (no JavaScript), and records the result in [regression/history.md](regression/history.md). It needs a signed-in customer and a signed-in admin in that browser, done once by a person: sessions don't expire, and the agent never signs out. Steps marked human-only (signing in/out, creating accounts, private windows) are reported as `SKIP`.
 
 **Why an agent in a browser, and not only Playwright?** These runs measure how consistent the agent and its skill are when the same cases run again and again, and whether the skill improves itself from its own failures. They aren't meant to replace automated tests. The findings from 20 runs are in [regression/summary.md](regression/summary.md). For deterministic, repeatable coverage use the Playwright specs in `apps/web/e2e/` and `apps/admin/e2e/` (see AGENTS.md → Commands).
 
