@@ -11,3 +11,4 @@ Run the batch of 10 with:
 | Run | Started (UTC) | Duration | Pass | Fail | Skip | Error | Results | Values | Changes vs previous |
 |---|---|---|---|---|---|---|---|---|---|
 | 1 | 2026-10-06 14:06 | 10m18s | 13 | 1 | 1 | 0 | `FPPPP PPPPP PSPPP` | n/a | first run |
+| 2 | 2026-10-06 14:17 | 8m17s | 13 | 1 | 1 | 0 | `FPPPP PPPPP PSPPP` | same | none |
