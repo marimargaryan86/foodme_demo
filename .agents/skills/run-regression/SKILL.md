@@ -201,6 +201,7 @@ Needs the user: <e.g. sign-in missing, an order left active, Playwright tools un
 
 Only lessons that aren't in the procedure above yet; newest first.
 
+- 2026-10-06 (run 5): `cleanup-data.mjs --only` takes space-separated order numbers (`--only FM-1 FM-2 FM-3`); a comma list prints "Nothing to clean up" and rejects nothing.
 - 2026-10-06 (run 4): Keep `browser_find` patterns narrow: a loose regex such as `button \[ref` on a chef page returns the whole menu. Names set by `aria-label` (e.g. **Remove item**) aren't page text, so find them with `button "Remove item"`, not plain text. Text values in the observed-values block need double quotes (including TC14 `after_accept`/`after_deliver`), or `finish` reports a false change.
 - 2026-10-06 (run 1): Admin order id = order number minus 100000 (FM-100103 is `103`, not `3`). After a header search, refs for the search box change: `browser_find` "searchbox" again before the next search. A click can fail with "Ref not found" right after the page re-rendered; re-find the ref and click once (verify nothing was placed first).
 - 2026-10-06 (run 1): `browser_find` with a `regex` sometimes returns "No matches" right after a `browser_wait_for` that saw the text (also after a navigation); repeat it with plain `text` before treating the text as missing. Refs from `browser_find` stay valid for `browser_click`, and `browser_snapshot` with a `target` ref (e.g. the cart panel) is a cheap way to read one area.
