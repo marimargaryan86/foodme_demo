@@ -33,12 +33,14 @@ Read `tests/*.md` (except `README.md`), the newest `tests/regression/runs/run-NN
 
 For each: case ID, title, case file, the Known issue text or failing note, the newest run number and that case's result there (`PASS`/`FAIL`/`SKIP`/`ERROR`).
 
+If there is no run yet (`newest: none`), the newest run and each case's result are `none`: sync the known issues and bug-regression cases only, and take no comment actions. Never read runs from `tests/regression/archive/`.
+
 Collect with this exact command (don't retype a variant each sync), then read the matched case sections for titles and text:
 
 ```bash
-RUN=$(ls tests/regression/runs | tail -1); echo "newest: $RUN"
+RUN=$(ls tests/regression/runs 2>/dev/null | tail -1); echo "newest: ${RUN:-none}"
 grep -n "Known issue (found\|regression for FM-BUG" tests/*.md
-grep -E "^\| FM-TC-[0-9]+ \| FAIL" "tests/regression/runs/$RUN" | cut -d'|' -f2,3
+[ -n "$RUN" ] && grep -E "^\| FM-TC-[0-9]+ \| FAIL" "tests/regression/runs/$RUN" | cut -d'|' -f2,3
 ```
 
 ## 3. Find each case's ticket

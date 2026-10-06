@@ -57,7 +57,7 @@ Receiver details on checkout: keep what's prefilled; if empty use `QA Regression
 
 A wrong order is real and stays on prod; this guard is what replaced run 20's mistake.
 
-**How to drive the pages** (page tools only; proven techniques from runs 1–20):
+**How to drive the pages** (page tools only; proven techniques from the archived runs 1–20 in `tests/regression/archive/2026-10-05/`):
 
 - *Finding things:* use `find` with the visible name ("Mushroom soup dish", "Increase quantity button", "Place order button") or `read_page` with `filter: interactive`, and act on the returned `ref`. Prefer accessible names over positions. Take a fresh `read_page`/`find` after the page changes; old refs can point at removed elements.
 - *Filling fields:* `form_input` on the field's `ref` (found by its label: "Full name", "Phone", "Email", "City", "Street", "Building", "Rejection reason"); then `read_page` to confirm the value stuck. Never type at screen coordinates: fields move when validation messages appear. Use `computer type` only if `form_input` didn't take, after clicking the field by `ref`.
@@ -76,15 +76,15 @@ A wrong order is real and stays on prod; this guard is what replaced run 20's mi
 
 ## 3. Record
 
-1. Next run number = last row in `tests/regression/history.md` + 1.
+1. Next run number = last row in `tests/regression/history.md` + 1 (1 if the table has no rows yet). Create `tests/regression/runs/` if it doesn't exist.
 2. Write `tests/regression/runs/run-NNN.md`:
    - header: run number, UTC start time, duration, app URL;
    - table `| Case | Result | Note |` for FM-TC-01 … FM-TC-15 in ID order (notes: failing step + actual text, order numbers, "known issue");
    - **Observed values:** one `key=value` line per key in the list below, in that order, in a fenced block. Every run uses exactly these keys; never add, rename or drop one. A key you couldn't observe (SKIP, ERROR, a step that didn't run) is `n/a`.
-   - **Changes vs previous run:** compare the result letters **and every observed value** with the previous run's file. List each case whose result changed, and each key whose value changed as `key: old → new`. A changed value under a PASS counts as a change. If the previous run has no Observed values section (runs 1–20), write "values: n/a (previous run has none)" and compare letters only. Otherwise "none".
+   - **Changes vs previous run:** compare the result letters **and every observed value** with the previous run's file. List each case whose result changed, and each key whose value changed as `key: old → new`. A changed value under a PASS counts as a change. Run 1 has no previous run: write "first run". Otherwise list the changes, or "none". Compare only with `tests/regression/runs/`, never with the archive (it used a different method).
    - **Proposed case fixes:** or "none";
    - **Execution problems:** retries, timeouts, workarounds, or "none".
-3. Append one row to `tests/regression/history.md`. The `Results` column is 15 letters in case order 01–15 (`P`, `F`, `S`, `E`), grouped by 5: e.g. `FPPPP PPPPP PSPPP`. The `Values` column is `same` (no key changed), the number of changed keys (e.g. `2`), or `n/a` when the previous run has no values.
+3. Append one row to `tests/regression/history.md`. The `Results` column is 15 letters in case order 01–15 (`P`, `F`, `S`, `E`), grouped by 5: e.g. `FPPPP PPPPP PSPPP`. The `Values` column is `same` (no key changed), the number of changed keys (e.g. `2`), or `n/a` for run 1.
 
 ### Observed values: the fixed key list
 
