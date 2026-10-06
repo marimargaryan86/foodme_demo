@@ -201,6 +201,7 @@ Needs the user: <e.g. sign-in missing, an order left active, Playwright tools un
 
 Only lessons that aren't in the procedure above yet; newest first.
 
+- 2026-10-06 (run 1): Admin order id = order number minus 100000 (FM-100103 is `103`, not `3`). After a header search, refs for the search box change: `browser_find` "searchbox" again before the next search. A click can fail with "Ref not found" right after the page re-rendered; re-find the ref and click once (verify nothing was placed first).
 - 2026-10-06 (run 1): `browser_find` with a `regex` sometimes returns "No matches" right after a `browser_wait_for` that saw the text (also after a navigation); repeat it with plain `text` before treating the text as missing. Refs from `browser_find` stay valid for `browser_click`, and `browser_snapshot` with a `target` ref (e.g. the cart panel) is a cheap way to read one area.
 - 2026-10-05 (run 18): If tool calls stop being approved (e.g. auto mode "no verdict"), stop retrying after a few attempts, note the last step that finished and whether any order was placed, and resume from the next step when tools work again. Don't restart the run (that would place extra orders), and note the pause in Execution problems, since the duration includes it.
 - 2026-10-05 (run 17): If a chef page shows "Chef not found" for a known chef, that's the app's error handling (any failed request shows it). Record the case as FAIL with the evidence, then reload once so the remaining steps still run; don't retry silently until it passes.
