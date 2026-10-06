@@ -22,6 +22,7 @@ allowed-tools:
   - mcp__playwright__browser_tabs
   - mcp__playwright__browser_take_screenshot
   - mcp__playwright__browser_handle_dialog
+  - mcp__playwright__browser_close
   - Bash(node tests/prepare-data.mjs --dry-run)
   - Bash(node tests/cleanup-data.mjs --only *)
   - Bash(node tests/regression/record.mjs *)
@@ -85,7 +86,7 @@ Receiver details on checkout: keep what's prefilled; if empty use `QA Regression
 
 A wrong order is real and stays on prod; this guard is what replaced run 20's mistake.
 
-**How to drive the pages** (Playwright MCP page tools only; app-specific timings come from the archived runs in `tests/regression/archive/`):
+**How to drive the pages** (Playwright MCP page tools only):
 
 - *Reading:* `browser_snapshot` returns the accessibility tree with `ref`s and current field values. `browser_find` (text or regex) answers "is it on the page" without the whole tree: use it on **chef pages** (~150 dishes) and for checking that something is absent (no **Mark as …** buttons, no dialog).
 - *Targets:* act on the `ref` from the latest snapshot, passed as `target`, with `element` set to the visible name ("Mushroom soup dish", "Increase quantity button", "Place order button"). Prefer accessible names over positions. Take a fresh snapshot after the page changes; old refs can point at removed elements.
@@ -173,7 +174,7 @@ TC15.customer_final         "<tracking title> | <customer badge>"
 ## 4. Clean up
 
 1. `node tests/cleanup-data.mjs --only <order numbers from TC-09, TC-10, TC-11>`: rejects any still active. `--only` keeps it away from `tests/.run-data.md`, which belongs to manual sessions. These orders were created by this run, so no extra confirmation is needed.
-2. Close any tab you opened during the run except the storefront and admin tabs (`browser_tabs` `list`, then `close` by index); keep those two for the next run.
+2. Close the browser with `browser_close`. The sign-ins stay in the profile, and the next run opens a new browser and recreates the admin tab (step 4 of the setup).
 
 ## 5. Improve this skill
 

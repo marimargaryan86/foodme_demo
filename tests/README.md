@@ -38,9 +38,22 @@
 
 ## Agent runs (regression)
 
-`/run-regression` runs the agent-runnable steps of all 15 cases in Claude's Chrome tab group, clicking and reading the pages like a tester (no JavaScript), and records the result in [regression/history.md](regression/history.md). It needs a signed-in customer and a signed-in admin in that browser, done once by a person: sessions don't expire, and the agent never signs out. Steps marked human-only (signing in/out, creating accounts, private windows) are reported as `SKIP`.
+`/run-regression` runs the agent-runnable steps of all 15 cases in the Playwright MCP browser (see below), clicking and reading the pages like a tester (no JavaScript), and records the result in [regression/history.md](regression/history.md). It needs a signed-in customer and a signed-in admin in that browser, done once by a person: sessions persist in its profile, and the agent never signs out. Steps marked human-only (signing in/out, creating accounts, private windows) are reported as `SKIP`.
 
-**Why an agent in a browser, and not only Playwright?** These runs measure how consistent the agent and its skill are when the same cases run again and again, and whether the skill improves itself from its own failures. They aren't meant to replace automated tests. The findings from the first 20 runs are in [regression/archive/2026-10-05/summary.md](regression/archive/2026-10-05/summary.md); new batches start in [regression/history.md](regression/history.md). For deterministic, repeatable coverage use the Playwright specs in `apps/web/e2e/` and `apps/admin/e2e/` (see AGENTS.md → Commands).
+**Why an agent in a browser, and not only Playwright specs?** These runs measure how consistent the agent and its skill are when the same cases run again and again, and whether the skill improves itself from its own failures. They aren't meant to replace automated tests. Runs are recorded in [regression/history.md](regression/history.md). Each run runs in its own subagent, so a 10-run `/goal` batch doesn't grow one conversation; the `/goal` command for the batch is in history.md. For deterministic, repeatable coverage use the Playwright specs in `apps/web/e2e/` and `apps/admin/e2e/` (see AGENTS.md → Commands).
+
+### Signing in, once
+
+The regression runs in the Playwright MCP browser (server `playwright` in `.mcp.json`), which keeps its own Chrome profile in `.playwright-profile/`, so your normal Chrome sign-ins don't carry over. Once per machine:
+
+1. Start Claude Code in this repo and approve the `playwright` server (`/mcp`).
+2. With no Playwright browser open, start Chrome on that profile from the repo root:
+   ```bash
+   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --user-data-dir="$PWD/.playwright-profile"
+   ```
+3. Sign in a test customer on the storefront (`/login`) and the admin on `/backoffice/`, then quit that Chrome window (Cmd+Q). Only one browser can use the profile at a time.
+
+To run only a few cases without recording a regression run, ask in a session, e.g. "run FM-TC-01 to 03 with Playwright MCP, as in the run-regression skill".
 
 ## Shared preconditions
 

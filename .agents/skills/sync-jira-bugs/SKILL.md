@@ -33,7 +33,7 @@ Read `tests/*.md` (except `README.md`), the newest `tests/regression/runs/run-NN
 
 For each: case ID, title, case file, the Known issue text or failing note, the newest run number and that case's result there (`PASS`/`FAIL`/`SKIP`/`ERROR`).
 
-If there is no run yet (`newest: none`), the newest run and each case's result are `none`: sync the known issues and bug-regression cases only, and take no comment actions. Never read runs from `tests/regression/archive/`.
+If there is no run yet (`newest: none`), the newest run and each case's result are `none`: sync the known issues and bug-regression cases only, and take no comment actions.
 
 Collect with this exact command (don't retype a variant each sync), then read the matched case sections for titles and text:
 
