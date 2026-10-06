@@ -2,6 +2,10 @@
 name: sync-jira-bugs
 description: Sync FoodMe bugs from the manual test cases and the latest regression run to Jira (project KAN on marimargaryan86.atlassian.net). Finds the ticket for each known issue, failing case and bug-regression case, creates a ticket only when none exists, and writes to Jira only when the evidence changed. Records the case-to-ticket map and a sync log in tests/jira/. Use when the user asks to sync, file or check bugs in Jira, or when a /goal asks for repeated syncs.
 argument-hint: "[--dry-run]"
+# Each sync gets a fresh context (a forked subagent), so a /goal batch measures the skill, not a growing conversation.
+# Foreground (background: false): the /goal turn waits for the sync, so two syncs never write to Jira at once.
+context: fork
+background: false
 ---
 
 # Sync bugs to Jira
