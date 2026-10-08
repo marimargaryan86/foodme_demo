@@ -12,3 +12,13 @@ Each sync runs in its own forked subagent. Run the batch of 10 with (type `/goal
 
 | Sync | Started (UTC) | Duration | Regression run | Cases | Created | Labelled | Commented | Jira writes | Map | Changes vs previous |
 |---|---|---|---|---|---|---|---|---|---|---|
+| 1 | 11:08:35 | 24s | run-010 | 3 | 0 | 0 | 1 | 1 | 01=KAN-5 04=KAN-4 06=KAN-6 | commented on KAN-6 (run 10 PASS); no map or status changes |
+| 2 | 11:09:08 | 16s | run-010 | 3 | 0 | 0 | 0 | 0 | 01=KAN-5 04=KAN-4 06=KAN-6 | none |
+| 3 | 11:09:34 | 10s | run-010 | 3 | 0 | 0 | 0 | 0 | 01=KAN-5 04=KAN-4 06=KAN-6 | none |
+| 4 | 11:09:59 | 11s | run-010 | 3 | 0 | 0 | 0 | 0 | 01=KAN-5 04=KAN-4 06=KAN-6 | none |
+| 5 | 11:10:20 | 13s | run-010 | 3 | 0 | 0 | 0 | 0 | 01=KAN-5 04=KAN-4 06=KAN-6 | none |
+| 6 | 11:10:42 | 11s | run-010 | 3 | 0 | 0 | 0 | 0 | 01=KAN-5 04=KAN-4 06=KAN-6 | none |
+| 7 | 11:11:02 | 11s | run-010 | 3 | 0 | 0 | 0 | 0 | 01=KAN-5 04=KAN-4 06=KAN-6 | none |
+| 8 | 11:11:22 | 15s | run-010 | 3 | 0 | 0 | 0 | 0 | 01=KAN-5 04=KAN-4 06=KAN-6 | none |
+| 9 | 11:11:48 | 13s | run-010 | 3 | 0 | 0 | 0 | 0 | 01=KAN-5 04=KAN-4 06=KAN-6 | none |
+| 10 | 11:12:09 | 10s | run-010 | 3 | 0 | 0 | 0 | 0 | 01=KAN-5 04=KAN-4 06=KAN-6 | none |

@@ -4,6 +4,6 @@ Case-to-ticket map kept by the `sync-jira-bugs` skill (project `KAN`, https://ma
 
 | Case | Ticket | Ticket status | Kind | Last run | Last result | Last action |
 |---|---|---|---|---|---|---|
-| FM-TC-01 | KAN-5 | To Do | known issue, failing | archive 20 | FAIL | labelled (sync 1) |
-| FM-TC-04 | KAN-4 | Done | bug regression (FM-BUG-07) | archive 20 | PASS | labelled (sync 1) |
-| FM-TC-06 | KAN-6 | To Do | known issue | archive 20 | PASS | created (sync 1) |
+| FM-TC-01 | KAN-5 | To Do | known issue, failing | run-010 | FAIL | none |
+| FM-TC-04 | KAN-4 | Done | bug regression (FM-BUG-07) | run-010 | PASS | none |
+| FM-TC-06 | KAN-6 | To Do | known issue | run-010 | PASS | none |
