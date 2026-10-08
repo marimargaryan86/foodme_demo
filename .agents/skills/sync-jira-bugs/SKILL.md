@@ -77,7 +77,7 @@ Steps 2 and 3 for all cases can be one JQL (`key in (…) OR labels = "fm-tc-NN"
 ## 5. Apply and record
 
 1. Apply the actions one at a time (create → then label → then comment). After a create, write the new key into `bugs.md` immediately, before the next case, so an interrupted sync can't create it twice.
-2. Rewrite `tests/jira/bugs.md`: one row per case from step 2, sorted by ID: `| Case | Ticket | Ticket status | Kind | Last run | Last result | Last action |`.
+2. Rewrite `tests/jira/bugs.md`: one row per case from step 2, sorted by ID: `| Case | Ticket | Ticket status | Kind | Last run | Last result | Last action |`. Always rewrite it, even when nothing changed. `Last action` is this sync's action only (`created`, `labelled`, `commented` or `none`), never carried over from an earlier sync, so a sync that wrote nothing sets every row to `none`.
 3. Append one row to `tests/jira/sync-history.md`: sync number (last + 1), UTC start and duration: at the start of step 1 run `date -u +%s > /tmp/sync-start; date -u +%H:%M:%S`, and here `echo $(( $(date -u +%s) - $(cat /tmp/sync-start) ))s`; record the start to the second and the duration in seconds, never estimated or rounded, newest regression run, number of cases, `created`/`labelled`/`commented` counts, **Jira writes** (total), the **Map** fingerprint (`01=KAN-5 04=KAN-4 06=KAN-6`, case numbers without the prefix, in order), and **Changes vs previous** (actions taken, map changes, ticket status changes, or "none").
 
 ## 6. Improve this skill
