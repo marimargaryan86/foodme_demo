@@ -67,3 +67,10 @@ tests/.run-data.md
 # Playwright MCP (.mcp.json): browser profile with the signed-in sessions, and its output files
 .playwright-profile/
 .playwright-mcp/
+
+# AgentSecrets environment files
+.env.development
+.env.staging
+.env.production
+.agentsecrets/
+.agent/
