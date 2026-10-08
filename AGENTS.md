@@ -55,7 +55,7 @@ PLAYWRIGHT_BASE_URL=$BASE VITE_API_BASE_URL=$BASE ADMIN_BASE_URL=$BASE/backoffic
 ```
 `npm run test:e2e:all` in `apps/web` runs both suites (with the same env vars).
 
-CI's e2e job uses `infra/docker-compose.yml`, which isn't in the repo, so that job is broken. The compose notes in `.env.example` are out of date for the same reason.
+CI's e2e job uses `infra/docker-compose.yml`, which isn't in the repo, so that job is broken. `.env.example` only lists the Qase uploader variables (`QASE_API_TOKEN`, `QASE_PROJECT`); the app needs no local env file.
 
 ## Live environment
 
