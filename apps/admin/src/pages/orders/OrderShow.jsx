@@ -19,6 +19,7 @@ import {
     DialogActions,
     TextField,
     Stack,
+    Rating,
 } from '@mui/material';
 import { OrderStatus, OrderStatusColors, OrderStatusTransitions } from '../../constants/OrderStatus.jsx';
 import { updateOrderStatus } from '../../api/order-api.js';
@@ -163,6 +164,36 @@ const OrderDetails = () => {
                     <Typography variant="h6">Total</Typography>
                     <Typography variant="h6">{record.totalPrice} AMD</Typography>
                 </Stack>
+
+                {record.status === OrderStatus.DELIVERED && (
+                    <>
+                        <Divider sx={{ my: 2 }} />
+                        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+                            Customer review
+                        </Typography>
+                        {record.rating ? (
+                            <Box>
+                                <Stack direction="row" spacing={1} alignItems="center">
+                                    <Rating
+                                        readOnly
+                                        value={record.rating.stars}
+                                        aria-label={`${record.rating.stars} out of 5 stars`}
+                                    />
+                                    <Typography variant="body2" color="text.secondary">
+                                        {new Date(record.rating.createdAt).toLocaleString()}
+                                    </Typography>
+                                </Stack>
+                                {record.rating.comment && (
+                                    <Typography sx={{ mt: 1, whiteSpace: 'pre-wrap' }}>
+                                        {record.rating.comment}
+                                    </Typography>
+                                )}
+                            </Box>
+                        ) : (
+                            <Typography color="text.secondary">No review yet</Typography>
+                        )}
+                    </>
+                )}
 
                 {availableTransitions.length > 0 && (
                     <>

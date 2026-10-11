@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Check, ChefHat, Package, Truck, X } from "lucide-react";
 import { foodmeApi } from "@/api/foodme";
 import { Button } from "@/components/ui/button";
+import { StarDisplay } from "@/components/sections/star-rating";
 import { formatAmd } from "@/lib/utils";
 import { useAuth } from "@/providers/auth-provider";
 
@@ -172,6 +173,20 @@ export default function Tracking() {
           )}
         </div>
       </div>
+
+      {data.rating && (
+        <div className="bezel-outer shadow-diffuse mt-5 animate-fade-up [animation-delay:90ms]">
+          <div className="bezel-inner px-5 py-4">
+            <p className="text-base font-bold text-zinc-900">Your rating</p>
+            <div className="mt-2">
+              <StarDisplay value={data.rating.stars} size={20} />
+            </div>
+            {data.rating.comment && (
+              <p className="mt-2 whitespace-pre-wrap break-words text-sm text-zinc-600">{data.rating.comment}</p>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="bezel-outer shadow-diffuse mt-5 animate-fade-up [animation-delay:120ms]">
         <div className="bezel-inner overflow-hidden">
