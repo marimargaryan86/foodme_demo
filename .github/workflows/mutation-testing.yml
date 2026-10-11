@@ -53,8 +53,8 @@ jobs:
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             CLASSES=$(git diff --name-only --diff-filter=AM \
                 "origin/${{ github.event.pull_request.base.ref }}...HEAD" -- 'apps/backend/src/main/java/**/*.java' \
-              | grep -vE '/(dto|entity)/' \
-              | sed -E 's#apps/backend/src/main/java/##; s#\.java$##; s#/#.#g' \
+              | grep -vE '/(dto|model)/' \
+              | sed -E 's#apps/backend/src/main/java/##; s#\.java$##; s#/#.#g; s#$#*#' \
               | paste -sd, -)
           else
             CLASSES='${{ inputs.classes }}'

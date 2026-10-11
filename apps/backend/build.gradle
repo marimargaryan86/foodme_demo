@@ -68,7 +68,9 @@ pitest {
     targetClasses = project.hasProperty('mutateClasses')
             ? project.property('mutateClasses').toString().split(',').toList()
             : ['am.foodme.backend.*']
-    excludedClasses = ['am.foodme.backend.dto.*', 'am.foodme.backend.FoodmeBackendApplication',
+    // tests live in am.foodme.backend, not next to the mutated class, so don't let PIT default to targetClasses
+    targetTests = ['am.foodme.backend.*']
+    excludedClasses = ['am.foodme.backend.dto.*', 'am.foodme.backend.model.*', 'am.foodme.backend.FoodmeBackendApplication',
                        'am.foodme.backend.config.SimulatedLatencyConfig']
     threads = 2
     outputFormats = ['HTML', 'XML']
