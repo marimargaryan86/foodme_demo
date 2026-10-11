@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronRight, Package } from "lucide-react";
 import { foodmeApi } from "@/api/foodme";
 import { Button } from "@/components/ui/button";
+import { RateOrderDialog } from "@/components/sections/rate-order-dialog";
+import { StarDisplay } from "@/components/sections/star-rating";
 import { useAuth } from "@/providers/auth-provider";
 import { formatAmd } from "@/lib/utils";
 
@@ -32,6 +35,7 @@ function formatOrderDate(value: string) {
 
 export default function Orders() {
   const { isAuthenticated, customer, logout } = useAuth();
+  const [ratingOrder, setRatingOrder] = useState<string | null>(null);
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["my-orders", customer?.id],
@@ -120,9 +124,40 @@ export default function Orders() {
                   </div>
                 </div>
               </Link>
+              {order.status === "DELIVERED" && (
+                <div className="flex items-center gap-3 px-5 pt-2">
+                  {order.rating ? (
+                    <>
+                      <StarDisplay value={order.rating.stars} />
+                      {order.rating.comment && (
+                        <p className="min-w-0 truncate text-sm text-zinc-500">{order.rating.comment}</p>
+                      )}
+                    </>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setRatingOrder(order.number)}
+                    >
+                      Rate order
+                    </Button>
+                  )}
+                </div>
+              )}
             </li>
           ))}
         </ul>
+      )}
+
+      {ratingOrder && (
+        <RateOrderDialog
+          orderNumber={ratingOrder}
+          open
+          onOpenChange={(open) => {
+            if (!open) setRatingOrder(null);
+          }}
+        />
       )}
     </div>
   );

@@ -7,6 +7,8 @@ import am.foodme.backend.dto.DeliveryPriceResponseDto;
 import am.foodme.backend.dto.OrderCreateResponseDto;
 import am.foodme.backend.dto.OrderDto;
 import am.foodme.backend.dto.OrderListResponseDto;
+import am.foodme.backend.dto.OrderRatingDto;
+import am.foodme.backend.dto.OrderRatingRequestDto;
 import am.foodme.backend.exceptionHandler.BadRequestException;
 import am.foodme.backend.exceptionHandler.NotFoundException;
 import am.foodme.backend.model.Address;
@@ -15,12 +17,15 @@ import am.foodme.backend.model.Customer;
 import am.foodme.backend.model.Dish;
 import am.foodme.backend.model.Order;
 import am.foodme.backend.model.OrderDish;
+import am.foodme.backend.model.OrderRating;
 import am.foodme.backend.repository.ChefRepository;
 import am.foodme.backend.repository.CustomerRepository;
 import am.foodme.backend.repository.DishRepository;
+import am.foodme.backend.repository.OrderRatingRepository;
 import am.foodme.backend.repository.OrderRepository;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.data.domain.Page;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,15 +41,17 @@ public class OrderService {
     private final ChefRepository chefRepository;
     private final DishRepository dishRepository;
     private final CustomerRepository customerRepository;
+    private final OrderRatingRepository orderRatingRepository;
     private final MeterRegistry meterRegistry;
 
     public OrderService(OrderRepository orderRepository, ChefRepository chefRepository,
                          DishRepository dishRepository, CustomerRepository customerRepository,
-                         MeterRegistry meterRegistry) {
+                         OrderRatingRepository orderRatingRepository, MeterRegistry meterRegistry) {
         this.orderRepository = orderRepository;
         this.chefRepository = chefRepository;
         this.dishRepository = dishRepository;
         this.customerRepository = customerRepository;
+        this.orderRatingRepository = orderRatingRepository;
         this.meterRegistry = meterRegistry;
     }
 
@@ -178,5 +185,55 @@ public class OrderService {
                 orders.getContent().stream().map(OrderDto::mapEntityToDto).toList(),
                 orders.getTotalElements()
         );
+    }
+
+    private static final int MAX_COMMENT_LENGTH = 1000;
+
+    /** Saves the customer's rating for a delivered order and recalculates the chef's average rating. */
+    @Transactional
+    public OrderRatingDto rateOrder(String number, OrderRatingRequestDto request, String customerEmail) {
+        Customer customer = customerRepository.findByEmail(customerEmail == null ? "" : customerEmail.trim().toLowerCase())
+                .orElseThrow(() -> new NotFoundException("Customer not found"));
+
+        // someone else's order behaves as "not found"
+        Order order = orderRepository.findByNumber(number)
+                .filter(o -> o.getCustomer() != null && o.getCustomer().getId().equals(customer.getId()))
+                .orElseThrow(() -> new NotFoundException("Order " + number + " not found"));
+
+        Double stars = request.getStars();
+        if (stars == null || stars < 1 || stars > 5 || stars != Math.rint(stars)) {
+            throw new BadRequestException("Rating must be a whole number from 1 to 5.");
+        }
+        String comment = request.getComment() == null || request.getComment().isBlank()
+                ? null : request.getComment();
+        if (comment != null && comment.length() > MAX_COMMENT_LENGTH) {
+            throw new BadRequestException("Comment must be at most " + MAX_COMMENT_LENGTH + " characters.");
+        }
+        if (!"DELIVERED".equals(order.getStatus())) {
+            throw new BadRequestException("Only delivered orders can be reviewed.");
+        }
+        if (orderRatingRepository.existsByOrderId(order.getId())) {
+            throw new BadRequestException("Order already reviewed.");
+        }
+
+        OrderRating rating = new OrderRating();
+        rating.setOrder(order);
+        rating.setCustomer(customer);
+        rating.setChef(order.getChef());
+        rating.setStars(stars.intValue());
+        rating.setComment(comment);
+        rating.setCreatedAt(LocalDateTime.now());
+        try {
+            // flush so the unique(order_id) constraint catches a concurrent second rating
+            orderRatingRepository.saveAndFlush(rating);
+        } catch (DataIntegrityViolationException e) {
+            throw new BadRequestException("Order already reviewed.");
+        }
+
+        Double average = orderRatingRepository.averageStarsByChefId(order.getChef().getId());
+        order.getChef().setRating(Math.round(average * 10) / 10.0);
+        chefRepository.save(order.getChef());
+
+        return OrderRatingDto.mapEntityToDto(rating);
     }
 }
