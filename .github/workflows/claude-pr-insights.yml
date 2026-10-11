@@ -1,0 +1,75 @@
+name: Claude PR vs Main Insights
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, ready_for_review, reopened]
+
+concurrency:
+  group: pr-insights-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  insights:
+    # Fork PRs get no secrets, so skip them instead of failing.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      id-token: write
+    steps:
+      - name: Checkout PR with full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute diff stats against main
+        id: stats
+        run: |
+          BASE=origin/${{ github.event.pull_request.base.ref }}
+          {
+            echo "## Files changed (vs $BASE)"
+            git diff --stat "$BASE...HEAD" | tail -n 60
+            echo
+            echo "## Commits"
+            git log --oneline "$BASE..HEAD" | head -n 40
+          } > "$RUNNER_TEMP/diff-summary.md"
+          echo "path=$RUNNER_TEMP/diff-summary.md" >> "$GITHUB_OUTPUT"
+
+      - name: Compare PR with main and comment
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          track_progress: true
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+            BASE: origin/${{ github.event.pull_request.base.ref }}
+            DIFF SUMMARY FILE: ${{ steps.stats.outputs.path }}
+
+            Compare this PR's implementation with main and explain what actually changes.
+            Use `git diff origin/${{ github.event.pull_request.base.ref }}...HEAD` and read the
+            changed files AND the main-side versions of them (`git show origin/main:<path>`)
+            so you describe behavior, not just lines. This is NOT a line-by-line bug review
+            (claude-code-review.yml does that); focus on impact.
+
+            Post ONE summary comment with `gh pr comment --edit-last --create-if-none`
+            (update it on every push, never add a second one). Sections, skip any that are empty:
+
+            1. **What changed vs main**: 3-6 bullets on behavior, by area (backend / web / admin / infra / tests).
+            2. **API & contract changes**: new/changed/removed endpoints, DTO fields, status codes,
+               anything the storefront or admin dataProvider.js depends on. Flag breaking changes.
+            3. **Database**: new Flyway migrations, entity changes without a migration, edited applied migrations.
+            4. **Test coverage delta**: which changed code has backend/e2e tests, which has none,
+               and which manual cases in `tests/*.md` should be re-run (name them).
+            5. **Risk**: Low/Medium/High with the 1-3 reasons, and what to verify manually.
+            6. **Size**: files / lines changed and whether the PR should be split.
+
+            Rules (see CLAUDE.md / AGENTS.md):
+            - Do NOT flag the intentional course behavior: simulated latency, FlakyHeartbeatJob,
+              GET /api/debug/boom, flake-*.spec.ts, CORS *, hardcoded JWT secret and admin credentials.
+            - Keep it under ~300 words, concrete, cite file paths. No praise filler.
+          claude_args: |
+            --allowedTools "Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git ls-tree:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Read,Grep,Glob"

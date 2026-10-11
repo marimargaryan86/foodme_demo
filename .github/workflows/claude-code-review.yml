@@ -9,8 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: read
-      issues: read
+      pull-requests: write
+      issues: write
       id-token: write
     steps:
       - name: Checkout repository
@@ -28,5 +28,14 @@ jobs:
 
             Review this pull request for correctness bugs, security problems and missing tests.
             Be concise and constructive. Use inline comments for specific lines and one summary comment.
+
+            Project rules (see CLAUDE.md / AGENTS.md):
+            - Do NOT flag the intentional course behavior: simulated latency, FlakyHeartbeatJob,
+              GET /api/debug/boom, flake-*.spec.ts, CORS *, hardcoded JWT secret and admin credentials.
+            - Every schema change needs a new Flyway migration (never edit an applied one); JPA uses ddl-auto=validate.
+            - New DTOs with an image URL must be added to ImageUrlResponseAdvice.
+            - E2E specs: no fixed waits (waitForTimeout/setTimeout/sleep), role/label locators, a fresh customer per test,
+              no changes to shared seed data, relative #/ routes in admin specs.
+            - Keep ARIA labels and form names stable; bug-fix commits cite the ticket ID, e.g. (FM-BUG-07).
           claude_args: |
             --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"

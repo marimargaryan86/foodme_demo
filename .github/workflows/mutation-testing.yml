@@ -1,0 +1,129 @@
+name: Mutation Testing
+
+# PRs: mutate only the backend classes the PR changed (fast).
+# Manual run: mutate the whole backend (slow, can take a long time on free runners).
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, ready_for_review, reopened]
+    paths:
+      - "apps/backend/src/main/**"
+      - "apps/backend/src/test/**"
+      - "apps/backend/build.gradle"
+  workflow_dispatch:
+    inputs:
+      classes:
+        description: "Comma-separated classes/globs to mutate (empty = whole backend)"
+        required: false
+        default: ""
+
+concurrency:
+  group: mutation-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pitest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      pull-requests: write
+    defaults:
+      run:
+        working-directory: apps/backend
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      # gradle-wrapper.jar is gitignored, so ./gradlew can't run in CI; use the same Gradle as the Dockerfile.
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.6"
+
+      - name: Pick classes to mutate
+        id: classes
+        working-directory: .
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            CLASSES=$(git diff --name-only --diff-filter=AM \
+                "origin/${{ github.event.pull_request.base.ref }}...HEAD" -- 'apps/backend/src/main/java/**/*.java' \
+              | grep -vE '/(dto|entity)/' \
+              | sed -E 's#apps/backend/src/main/java/##; s#\.java$##; s#/#.#g' \
+              | paste -sd, -)
+          else
+            CLASSES='${{ inputs.classes }}'
+          fi
+          echo "classes=$CLASSES" >> "$GITHUB_OUTPUT"
+          echo "Mutating: ${CLASSES:-<whole backend>}"
+
+      - name: Skip when nothing mutable changed
+        id: gate
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ] && [ -z "${{ steps.classes.outputs.classes }}" ]; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run PIT
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          ARGS=""
+          if [ -n "${{ steps.classes.outputs.classes }}" ]; then
+            ARGS="-PmutateClasses=${{ steps.classes.outputs.classes }}"
+          fi
+          gradle pitest $ARGS --no-daemon
+
+      - name: Summarize survivors
+        if: steps.gate.outputs.run == 'true' && always()
+        run: |
+          python3 - <<'EOF' > "$RUNNER_TEMP/mutation-summary.md"
+          import os, xml.etree.ElementTree as ET
+          path = "build/reports/pitest/mutations.xml"
+          print("<!-- mutation-testing -->")
+          print("### 🧬 Mutation testing (PIT)")
+          if not os.path.exists(path):
+              print("No report produced (PIT failed or found no mutations). See the run log.")
+              raise SystemExit
+          ms = ET.parse(path).getroot().findall("mutation")
+          total = len(ms)
+          killed = sum(1 for m in ms if m.get("status") == "KILLED")
+          survived = [m for m in ms if m.get("status") == "SURVIVED"]
+          nocov = [m for m in ms if m.get("status") == "NO_COVERAGE"]
+          other = total - killed - len(survived) - len(nocov)
+          score = 100 * killed / total if total else 100
+          print(f"**Mutation score: {score:.0f}%** ({killed}/{total} killed, "
+                f"{len(survived)} survived, {len(nocov)} not covered, {other} timed out/other)")
+          print("\nScope: `${{ steps.classes.outputs.classes }}`" if "${{ steps.classes.outputs.classes }}" else "\nScope: whole backend")
+          def rows(items, title):
+              if not items: return
+              print(f"\n**{title}** (first 25)\n\n| Class | Line | Mutation |\n|---|---|---|")
+              for m in items[:25]:
+                  cls = m.findtext("mutatedClass").split(".")[-1]
+                  print(f"| {cls}.{m.findtext('mutatedMethod')} | {m.findtext('lineNumber')} | {m.findtext('description')} |")
+          rows(survived, "Survived: tests ran but did not notice the change")
+          rows(nocov, "No coverage: no test executes this line")
+          print("\nFull HTML report: download the `pitest-report` artifact of this run.")
+          EOF
+          cat "$RUNNER_TEMP/mutation-summary.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload HTML report
+        if: steps.gate.outputs.run == 'true' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pitest-report
+          path: apps/backend/build/reports/pitest
+          if-no-files-found: ignore
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request' && steps.gate.outputs.run == 'true' && always()
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: mutation-testing
+          path: ${{ runner.temp }}/mutation-summary.md

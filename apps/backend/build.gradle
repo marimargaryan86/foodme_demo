@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.3.4'
     id 'io.spring.dependency-management' version '1.1.6'
+    id 'info.solidsoft.pitest' version '1.15.0'
 }
 
 group = 'am.foodme'
@@ -58,4 +59,20 @@ tasks.named('test') {
     testLogging {
         events 'passed', 'failed', 'skipped'
     }
+}
+
+// Mutation testing (PIT). CI passes -PmutateClasses=a.B,a.C to limit it to changed classes.
+pitest {
+    pitestVersion = '1.16.1'
+    junit5PluginVersion = '1.2.1'
+    targetClasses = project.hasProperty('mutateClasses')
+            ? project.property('mutateClasses').toString().split(',').toList()
+            : ['am.foodme.backend.*']
+    excludedClasses = ['am.foodme.backend.dto.*', 'am.foodme.backend.FoodmeBackendApplication',
+                       'am.foodme.backend.config.SimulatedLatencyConfig']
+    threads = 2
+    outputFormats = ['HTML', 'XML']
+    timestampedReports = false
+    timeoutConstant = 10000
+    failWhenNoMutations = false
 }
