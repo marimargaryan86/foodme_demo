@@ -75,6 +75,6 @@ pitest {
     threads = 2
     outputFormats = ['HTML', 'XML']
     timestampedReports = false
-    timeoutConstant = 10000
+    timeoutConstInMillis = 10000
     failWhenNoMutations = false
 }
