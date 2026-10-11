@@ -1,5 +1,7 @@
 name: Claude PR vs Main Insights
 
+# Quality gate: fails on HIGH risk (breaking contract, schema change without migration, edited applied migration).
+
 on:
   pull_request:
     branches: [main]
@@ -42,12 +44,12 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          track_progress: true
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
             BASE: origin/${{ github.event.pull_request.base.ref }}
             DIFF SUMMARY FILE: ${{ steps.stats.outputs.path }}
+            REPORT FILE: ${{ runner.temp }}/pr-insights.md
 
             Compare this PR's implementation with main and explain what actually changes.
             Use `git diff origin/${{ github.event.pull_request.base.ref }}...HEAD` and read the
@@ -55,8 +57,8 @@ jobs:
             so you describe behavior, not just lines. This is NOT a line-by-line bug review
             (claude-code-review.yml does that); focus on impact.
 
-            Post ONE summary comment with `gh pr comment --edit-last --create-if-none`
-            (update it on every push, never add a second one). Sections, skip any that are empty:
+            WRITE the report to the REPORT FILE with the Write tool (the workflow posts it as one
+            updated comment; do not post it yourself). Sections, skip any that are empty:
 
             1. **What changed vs main**: 3-6 bullets on behavior, by area (backend / web / admin / infra / tests).
             2. **API & contract changes**: new/changed/removed endpoints, DTO fields, status codes,
@@ -71,5 +73,33 @@ jobs:
             - Do NOT flag the intentional course behavior: simulated latency, FlakyHeartbeatJob,
               GET /api/debug/boom, flake-*.spec.ts, CORS *, hardcoded JWT secret and admin credentials.
             - Keep it under ~300 words, concrete, cite file paths. No praise filler.
+            - The LAST line of the file must be exactly one of:
+                VERDICT: PASS   (risk Low or Medium)
+                VERDICT: FAIL   (risk High: an undocumented breaking API/DTO change, an entity change with
+                                 no Flyway migration, an edited applied migration, or a change the
+                                 storefront/admin cannot work with)
           claude_args: |
-            --allowedTools "Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git ls-tree:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Read,Grep,Glob"
+            --allowedTools "Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git ls-tree:*),Write,Bash(gh pr diff:*),Bash(gh pr view:*),Read,Grep,Glob"
+
+      - name: Check report
+        id: report
+        if: always()
+        run: '[ -s "$RUNNER_TEMP/pr-insights.md" ] && echo "exists=true" >> "$GITHUB_OUTPUT" || echo "exists=false" >> "$GITHUB_OUTPUT"'
+
+      - name: Post PR insights report
+        if: always() && steps.report.outputs.exists == 'true'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: claude-pr-insights
+          path: ${{ runner.temp }}/pr-insights.md
+
+      # Quality gate: fail closed. A missing report or verdict (including a skipped action) blocks the merge.
+      - name: Quality gate
+        if: always()
+        run: |
+          F="$RUNNER_TEMP/pr-insights.md"
+          if [ ! -s "$F" ]; then
+            echo "::error::No PR insights report was produced, so the gate fails closed."; exit 1
+          fi
+          if grep -qE '^VERDICT: PASS\s*$' "$F"; then echo "PR insights: PASS"; exit 0; fi
+          echo "::error::PR insights verdict is not PASS (see the PR comment)."; exit 1
