@@ -170,6 +170,17 @@ export interface OrderListResponseDto {
   count: number;
 }
 
+export interface OrderRatingDto {
+  stars: number;
+  comment: string | null;
+  createdAt: string;
+}
+
+export interface OrderRatingRequest {
+  stars: number;
+  comment?: string;
+}
+
 export interface FullOrderDto {
   number: string;
   status: string;
@@ -185,6 +196,8 @@ export interface FullOrderDto {
   orderDishList: OrderDishDto[];
   totalPrice: number;
   createdAt: string;
+  /** Null until the customer rates the order. */
+  rating: OrderRatingDto | null;
 }
 
 export interface ApiError {
