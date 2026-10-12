@@ -209,9 +209,6 @@ public class OrderService {
         if (comment != null && comment.length() > MAX_COMMENT_LENGTH) {
             throw new BadRequestException("Comment must be at most " + MAX_COMMENT_LENGTH + " characters.");
         }
-        if (!"DELIVERED".equals(order.getStatus())) {
-            throw new BadRequestException("Only delivered orders can be reviewed.");
-        }
         if (orderRatingRepository.existsByOrderId(order.getId())) {
             throw new BadRequestException("Order already reviewed.");
         }

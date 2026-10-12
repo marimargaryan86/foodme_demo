@@ -39,4 +39,7 @@ public class OrderRating {
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "admin_note", length = 500)
+    private String adminNote;
 }
