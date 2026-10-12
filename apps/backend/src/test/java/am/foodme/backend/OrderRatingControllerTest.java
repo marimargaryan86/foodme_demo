@@ -1,5 +1,6 @@
 package am.foodme.backend;
 
+import am.foodme.backend.repository.OrderRatingRepository;
 import am.foodme.backend.repository.OrderRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,9 @@ class OrderRatingControllerTest {
 
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private OrderRatingRepository orderRatingRepository;
 
     private String register() throws Exception {
         String response = mockMvc.perform(post("/api/auth/register")
@@ -173,6 +177,26 @@ class OrderRatingControllerTest {
         // rounded to one decimal
         assertEquals(Math.round(afterSecond * 10) / 10.0, afterSecond);
         assertEquals(Math.round(afterFirst * 10) / 10.0, afterFirst);
+    }
+
+    @Test
+    void starBoundaries_1And5_areAccepted() throws Exception {
+        String token = register();
+        rate(token, deliveredOrder(token), 1, null).andExpect(status().isOk())
+                .andExpect(jsonPath("$.stars").value(1));
+        rate(token, deliveredOrder(token), 5, null).andExpect(status().isOk())
+                .andExpect(jsonPath("$.stars").value(5));
+    }
+
+    @Test
+    void chefRating_equalsStoredAverageOfAllRatings() throws Exception {
+        String token = register();
+        rate(token, deliveredOrder(token), 5, null).andExpect(status().isOk());
+        rate(token, deliveredOrder(token), 2, null).andExpect(status().isOk());
+
+        double average = orderRatingRepository.averageStarsByChefId(2L);
+        double expected = Math.round(average * 10) / 10.0;
+        assertEquals(expected, chefRating());
     }
 
     private double chefRating() throws Exception {
