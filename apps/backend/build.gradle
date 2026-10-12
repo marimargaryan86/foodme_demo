@@ -73,6 +73,8 @@ pitest {
     excludedClasses = ['am.foodme.backend.dto.*', 'am.foodme.backend.model.*', 'am.foodme.backend.FoodmeBackendApplication',
                        'am.foodme.backend.config.SimulatedLatencyConfig']
     threads = 2
+    // fails `gradle pitest` (and the CI gate) below this mutation score; override with -PmutationThreshold=NN
+    mutationThreshold = (project.findProperty('mutationThreshold') ?: '60').toString().toInteger()
     outputFormats = ['HTML', 'XML']
     timestampedReports = false
     timeoutConstInMillis = 10000

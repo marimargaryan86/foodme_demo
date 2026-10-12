@@ -1,15 +1,14 @@
 name: Mutation Testing
 
+# Quality gate: PIT fails the build when the mutation score of the changed classes is below the threshold.
+# No `paths:` filter on purpose (required check); the job skips its steps when no backend class changed.
+
 # PRs: mutate only the backend classes the PR changed (fast).
 # Manual run: mutate the whole backend (slow, can take a long time on free runners).
 on:
   pull_request:
     branches: [main]
     types: [opened, synchronize, ready_for_review, reopened]
-    paths:
-      - "apps/backend/src/main/**"
-      - "apps/backend/src/test/**"
-      - "apps/backend/build.gradle"
   workflow_dispatch:
     inputs:
       classes:
@@ -78,7 +77,7 @@ jobs:
           if [ -n "${{ steps.classes.outputs.classes }}" ]; then
             ARGS="-PmutateClasses=${{ steps.classes.outputs.classes }}"
           fi
-          gradle pitest $ARGS --no-daemon
+          gradle pitest $ARGS -PmutationThreshold=${{ vars.MUTATION_THRESHOLD || 60 }} --no-daemon
 
       - name: Summarize survivors
         if: steps.gate.outputs.run == 'true' && always()
