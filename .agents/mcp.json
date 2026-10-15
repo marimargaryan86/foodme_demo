@@ -37,6 +37,17 @@
         "mcp",
         "serve"
       ]
+    },
+    "mcp-atlassian": {
+      "command": "uvx",
+      "args": [
+        "mcp-atlassian"
+      ],
+      "env": {
+        "JIRA_URL": "https://marimargaryan86.atlassian.net",
+        "JIRA_USERNAME": "${JIRA_USERNAME}",
+        "JIRA_API_TOKEN": "${JIRA_API_TOKEN}"
+      }
     }
   }
 }
